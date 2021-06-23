@@ -11,6 +11,7 @@ export interface IUser extends HasId, HasTimestamps {
     name: string;
     team: string;
     phone: string;
+    email: string;
 }
 
 export interface ITransaction<ProviderMetadata = any> extends HasId, HasTimestamps {

@@ -1,17 +1,17 @@
 import { Collection, Db } from "mongodb";
 import { ITransaction, IUser } from "../../models";
-import { InitiatePaymentArgs, IPaymentProviderRegistry, ITransactionService, CreateTransactionArgs } from "./types";
+import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
 
 const COLLECTION = "transactions";
 
 export interface TransactionServiceArgs {
-    paymentProviders: IPaymentProviderRegistry;
+    paymentHandlers: IPaymentHandlerProvider;
 }
 
 export class TransactionService implements ITransactionService {
     db: Db;
     collection: Collection<ITransaction>;
-    providers: IPaymentProviderRegistry;
+    handlers: IPaymentHandlerProvider;
 
     constructor(db: Db) {
         this.collection = db.collection(COLLECTION);
@@ -20,7 +20,7 @@ export class TransactionService implements ITransactionService {
     async initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction<any>> {
         const amount = Math.floor(args.amount);
 
-        const provider = this.providers.getDefault();
+        const provider = this.handlers.getDefault();
 
         const trxArgs: CreateTransactionArgs = {
             amount,

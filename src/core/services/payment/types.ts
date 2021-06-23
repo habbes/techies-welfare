@@ -7,17 +7,22 @@ export interface ITransactionService {
     checkTransactionStatus(transactionId: string): Promise<ITransaction>;
 }
 
-export interface IPaymentProvider<TProviderMetadata = Record<string, any>, TPaymentNotification = Record<string, any>> {
+export interface IPaymentHandler<TProviderMetadata = Record<string, any>, TPaymentNotification = Record<string, any>> {
     name(): string;
-    requestPaymentFromUser(user: IUser, amount: number): Promise<PaymentRequestResult>;
-    handlePaymentNotification(notification: TPaymentNotification): Promise<ProviderTransactionInfo>;
-    getTransaction(localTransaction: ITransaction): Promise<ProviderTransactionInfo>;
+    requestPaymentFromUser(user: IUser, amount: number): Promise<PaymentRequestResult<TProviderMetadata>>;
+    handlePaymentNotification(notification: TPaymentNotification): Promise<ProviderTransactionInfo<TProviderMetadata>>;
+    getTransaction(localTransaction: ITransaction): Promise<ProviderTransactionInfo<TProviderMetadata>>;
 }
 
-export interface IPaymentProviderRegistry {
-    register(provider: IPaymentProvider): void;
-    get<TProviderMetadata = Record<string, any>, TPaymentNotification = Record<string, any>>(name: string): IPaymentProvider<TProviderMetadata, TPaymentNotification>;
-    getDefault(): IPaymentProvider;
+export interface IPaymentHandlerRegistry {
+    register(provider: IPaymentHandler): void;
+    setDefault(name: string): void;
+    getProvider(): IPaymentHandlerProvider;
+}
+
+export interface IPaymentHandlerProvider {
+    get<TProviderMetadata = Record<string, any>, TPaymentNotification = Record<string, any>>(name: string): IPaymentHandler<TProviderMetadata, TPaymentNotification>;
+    getDefault(): IPaymentHandler;
 }
 
 export interface CreateTransactionArgs<TProviderMetadata = Record<string, any>> {
