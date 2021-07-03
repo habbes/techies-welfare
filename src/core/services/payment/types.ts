@@ -5,6 +5,7 @@ export interface ITransactionService {
     getUserBalance(userId: string): Promise<number>;
     getContributionsByUser(userId: string): Promise<ITransaction[]>;
     checkTransactionStatus(transactionId: string): Promise<ITransaction>;
+    handleProviderNotification<TPaymentNotification = Record<string, any>>(providerName: string, notification: TPaymentNotification): Promise<ITransaction>;
 }
 
 export interface IPaymentHandler<TProviderMetadata = Record<string, any>, TPaymentNotification = Record<string, any>> {

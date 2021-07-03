@@ -1,5 +1,6 @@
 import { Collection, Db } from "mongodb";
 import { ITransaction, IUser } from "../../models";
+import { generateId } from "../../../util";
 import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
 
 const COLLECTION = "transactions";
@@ -44,6 +45,38 @@ export class TransactionService implements ITransactionService {
             throw e;
         }
     }
+
+    async handleProviderNotification<TPaymentNotification = Record<string, any>>(providerName: string, notification: TPaymentNotification): Promise<ITransaction> {
+        try {
+            const now = new Date();
+            const provider = this.handlers.get(providerName);
+            const  result = await provider.handlePaymentNotification(notification);
+
+            const updatedRes = await this.collection.findOneAndUpdate({
+                providerTransactionId: result.providerTransactionId,
+                provider: provider.name()
+            }, {
+                $set: {
+                    status: result.status,
+                    failureReason: result.failureReason,
+                    metadata: result.metadata,
+                    updatedAt: now,
+                    amount: result.amount
+                }
+            }, {
+                returnDocument: "after"
+            });
+
+            if (!updatedRes.value) {
+                throw new Error("Unknown transaction");
+            }
+
+            return updatedRes.value;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
     
     getUserBalance(userId: string): Promise<number> {
         throw new Error("Method not implemented.");
@@ -58,7 +91,7 @@ export class TransactionService implements ITransactionService {
     private async create(args: CreateTransactionArgs): Promise<ITransaction> {
         const now = new Date();
         const tx: ITransaction = {
-            _id: "generateId",
+            _id: generateId(),
             ...args,
             amount: 0,
             status: args.status || 'pending',

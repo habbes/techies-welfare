@@ -1,4 +1,5 @@
 import { Db, Collection } from "mongodb";
+import { generateId } from "../../../util";
 import { IUser } from "../../models";
 import { CreateUserArgs, IUserService } from "./types";
 
@@ -15,7 +16,7 @@ export class UserService implements IUserService {
     async create(args: CreateUserArgs): Promise<IUser> {
         const input = {
             ...args,
-            _id: "generateId",
+            _id: generateId(),
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -38,6 +39,30 @@ export class UserService implements IUserService {
             }
 
             return user;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
+    async getByPhone(phone: string): Promise<IUser> {
+        try {
+            const user = await this.collection.findOne({ phone });
+            if (!user) {
+                throw new Error("not found");
+            }
+
+            return user;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
+    async getAll(): Promise<IUser[]> {
+        try {
+            const users = await this.collection.find({}).toArray();
+            return users;
         }
         catch (e) {
             throw e;
