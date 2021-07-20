@@ -1,16 +1,22 @@
 import { Db, Collection } from "mongodb";
 import { generateId } from "../../../util";
-import { IUser } from "../../models";
+import { ITransaction, IUser } from "../../models";
+import { InitiatePaymentArgs, ITransactionService } from "../payment";
 import { CreateUserArgs, IUserService } from "./types";
 
 export const COLLECTION = "users";
 
-export class UserService implements IUserService {
-    private db: Db;
-    private collection: Collection<IUser>;
+export interface UserServiceArgs {
+    transactions: ITransactionService;
+}
 
-    constructor(db: Db) {
-        this.collection = this.db.collection(COLLECTION);
+export class UserService implements IUserService {
+    private collection: Collection<IUser>;
+    private transactions: ITransactionService;
+
+    constructor(db: Db, args: UserServiceArgs) {
+        this.collection = db.collection(COLLECTION);
+        this.transactions = args.transactions;
     }
 
     async create(args: CreateUserArgs): Promise<IUser> {
@@ -63,6 +69,17 @@ export class UserService implements IUserService {
         try {
             const users = await this.collection.find({}).toArray();
             return users;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
+    async initiatePayment(id: string, args: InitiatePaymentArgs): Promise<ITransaction> {
+        try {
+            const user = await this.getById(id);
+            const trx = await this.transactions.initiateUserPayment(user, args);
+            return trx;
         }
         catch (e) {
             throw e;

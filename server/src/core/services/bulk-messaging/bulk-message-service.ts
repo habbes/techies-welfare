@@ -13,7 +13,7 @@ export interface BulkMessageServiceArgs {
   transport?: IMessageTransport;
   smsService?: ISmsService;
   recipientResolver?: IRecipientResolver;
-  users?: IUserService
+  users: IUserService
 }
 
 export class BulkMessageService implements IBulkMessageService {

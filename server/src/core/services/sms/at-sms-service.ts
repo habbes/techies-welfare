@@ -20,8 +20,10 @@ export class AtSmsService implements ISmsService {
     }
 
     async sendSms(to: string, message: string): Promise<void> {
+        // AT's phone numbers require a leading +
+        const atNumber = `+${to}`;
         const args: SendArgs = {
-            to: [to],
+            to: [atNumber],
             message
         };
 

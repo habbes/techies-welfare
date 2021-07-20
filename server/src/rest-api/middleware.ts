@@ -37,7 +37,7 @@ interface WrappedHandler {
  * @param handler
  * @param statusCode status code to send on success
  */
- export function wrapResponse(handler: WrappedHandler, statusCode = 200): RequestHandler {
+export function wrapResponse(handler: WrappedHandler, statusCode = 200): RequestHandler {
     return (req: AppRequest, res, next) =>
         handler(req).then(result => res.status(statusCode).send(result))
             .catch(next);

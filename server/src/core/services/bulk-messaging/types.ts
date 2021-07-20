@@ -2,6 +2,7 @@ import { IUser } from "../../models";
 
 export interface IBulkMessageService {
     send(recipients: string[], messageTemplate: string): Promise<BulkMessageReport>;
+    previewMessage(messageTemplate: string): Promise<string>;
 }
 
 export interface IMessageContextFactory {

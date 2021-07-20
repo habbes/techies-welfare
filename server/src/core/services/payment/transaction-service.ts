@@ -10,12 +10,12 @@ export interface TransactionServiceArgs {
 }
 
 export class TransactionService implements ITransactionService {
-    db: Db;
     collection: Collection<ITransaction>;
     handlers: IPaymentHandlerProvider;
 
-    constructor(db: Db) {
+    constructor(db: Db, args: TransactionServiceArgs) {
         this.collection = db.collection(COLLECTION);
+        this.handlers = args.paymentHandlers;
     }
 
     async initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction<any>> {

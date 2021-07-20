@@ -24,7 +24,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
             redirect_url: this.args.redirectUrl,
             customer: {
                 email: user.email,
-                phone_number: user.phone, // TODO what phone number to use
+                phone_number: convertPhoneNumberToFlwFormat(user.phone),
                 name: user.name
             },
             customizations: {
@@ -110,10 +110,6 @@ function extractTransactionInfo(data: FlutterwaveTransactionInfo): ProviderTrans
         flwStatus === "successful" ? "success" :
         flwStatus === "failed" ? "failed" :
         "pending";
-    
-    // phone number comes in in 07... format, strip the 0
-    const flwPhone = data.customer?.phone_number?.substring(1);
-    const phone = flwPhone ?? "";
 
     return {
         providerTransactionId: data.tx_ref,
@@ -122,6 +118,10 @@ function extractTransactionInfo(data: FlutterwaveTransactionInfo): ProviderTrans
         failureReason: status === "failed" ? data.processor_response : "",
         amount: data.amount
     };
+}
+
+function convertPhoneNumberToFlwFormat(phone: string) {
+    return `0${phone.substr(3)}`;
 }
 
 export type FlutterwaveProviderMetadata = FlutterwaveTransactionInfo | { paymentUrl: string };
