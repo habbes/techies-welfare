@@ -1,6 +1,7 @@
 import { bootstrap, loadAppConfigFrom } from "./core";
 import { createServer } from "./server";
 import { mountRestApi } from "./rest-api";
+import { mountFlutterwaveWebhooks } from "./webhooks";
 
 async function startServer() {
     try {
@@ -9,6 +10,8 @@ async function startServer() {
         const server = createServer(app);
 
         mountRestApi(server, "/api");
+
+        mountFlutterwaveWebhooks(server, config.flutterwaveWebhooksRoot);
 
         server.listen(config.port, () => {
             console.log(`Server listening on port ${config.port}`);
