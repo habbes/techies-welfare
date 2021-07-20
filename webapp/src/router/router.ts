@@ -4,7 +4,7 @@ import PaymentPage from "../pages/payment/payment-page.vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/payment', component: PaymentPage }
+    { path: '/pay', component: PaymentPage }
   ]
 });
 

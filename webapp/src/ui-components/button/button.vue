@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="rounded-md inline-flex justify-center bg-indigo-500 text-white px-3 py-2"
+    class="rounded-md inline-flex justify-center bg-indigo-500 text-white px-3 py-2 hover:bg-indigo-700"
     :class="classes"
   >
     <slot></slot>
