@@ -10,7 +10,7 @@ export class LinkGeneratorService implements ILinkGeneratorService {
     constructor(private args: LinkGeneratorArgs) {}
 
     getUserPaymentLink(user: IUser, amount: number): Promise<string> {
-        const query = { n: user.name, e: user.email, p: user.phone, a: amount };
+        const query = { u: user._id, n: user.name, e: user.email, p: user.phone, a: amount };
         const encodedQuery = querystring.encode(query);
         const link = `${this.args.baseUrl}/pay?${encodedQuery}`
 

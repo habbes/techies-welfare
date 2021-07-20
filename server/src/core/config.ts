@@ -72,7 +72,7 @@ export function loadAppConfigFrom(env: Record<string, string>): AppConfig {
         atUsername: env.AT_USERNAME || "sandbox",
         atWebhooksRoot: env.AT_WEBHOOKS || "/webhooks/at",
         atSmsSender: env.AT_SMS_SENDER || "",
-        flutterwaveLogoUrl: `${webAppBaseUrl}/img/logo.svg`,
+        flutterwaveLogoUrl: `${webAppBaseUrl}/img/logo.png`,
         flutterwaveRedirectUrl: `${webAppBaseUrl}/post-payment/flutterwave`,
         flutterwaveSecretKey: env.FLUTTERWAVE_SECRET_KEY || "",
         flutterwaveWebhooksRoot: env.FLUTTERWAVE_WEBHOOKS || "/webhooks/flutterwave",

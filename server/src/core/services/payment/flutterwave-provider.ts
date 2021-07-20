@@ -1,4 +1,5 @@
 import * as axios from "axios";
+import { generateId } from "../../../util";
 import { IUser, ITransaction, TransactionStatus } from "../../models";
 import { IPaymentHandler, PaymentRequestResult, ProviderTransactionInfo } from "./types";
 
@@ -17,7 +18,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
         const data = {
             // ideally tx_ref should be our transaction id
             // but since that isn't available to this method, we just generate a random unique id
-            tx_ref: "generateId",
+            tx_ref: generateId(),
             amount,
             currency: "KES",
             payment_options: "card,mpesa",

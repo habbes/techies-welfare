@@ -93,7 +93,7 @@ export class TransactionService implements ITransactionService {
         const tx: ITransaction = {
             _id: generateId(),
             ...args,
-            amount: 0,
+            amount: args.amount,
             status: args.status || 'pending',
             createdAt: now,
             updatedAt: now,
