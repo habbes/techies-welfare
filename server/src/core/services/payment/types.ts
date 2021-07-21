@@ -2,8 +2,8 @@ import { IUser, ITransaction, TransactionStatus, TransactionType } from "../../m
 
 export interface ITransactionService {
     initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction>;
-    getUserBalance(userId: string): Promise<number>;
-    getContributionsByUser(userId: string): Promise<ITransaction[]>;
+    getUserContributionsTotal(userId: string): Promise<number>;
+    getAllByUser(userId: string): Promise<ITransaction[]>;
     checkTransactionStatus(transactionId: string): Promise<ITransaction>;
     handleProviderNotification<TPaymentNotification = Record<string, any>>(providerName: string, notification: TPaymentNotification): Promise<ITransaction>;
 }

@@ -1,4 +1,4 @@
-import { ITransaction, IUser } from '../../models';
+import { ITransaction, IUser, IUserAccountSummary } from '../../models';
 import { InitiatePaymentArgs } from '../payment';
 
 export interface IUserService {
@@ -7,6 +7,8 @@ export interface IUserService {
     getByPhone(phone: string): Promise<IUser>;
     getAll(): Promise<IUser[]>;
     initiatePayment(id: string, args: InitiatePaymentArgs): Promise<ITransaction>;
+    getTransactions(id: string): Promise<ITransaction[]>;
+    getAccountSummary(id: string): Promise<IUserAccountSummary>;
 }
 
 export interface CreateUserArgs {
@@ -14,4 +16,5 @@ export interface CreateUserArgs {
     email: string;
     phone: string;
     team: string;
+    joinedAt?: Date;
 }

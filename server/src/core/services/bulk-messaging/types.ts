@@ -45,4 +45,6 @@ export interface MessageTemplateContext extends Record<string, any> {
     firstName: string;
     paymentLink: string;
     baseUrl: string;
+    totalContribution: number;
+    arrears: number;
 }

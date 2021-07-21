@@ -12,6 +12,12 @@ export interface IUser extends HasId, HasTimestamps {
     team: string;
     phone: string;
     email: string;
+    joinedAt: Date;
+}
+
+export interface IUserAccountSummary {
+    totalContribution: number;
+    arrears: number;
 }
 
 export interface ITransaction<ProviderMetadata = any> extends HasId, HasTimestamps {
@@ -26,3 +32,9 @@ export interface ITransaction<ProviderMetadata = any> extends HasId, HasTimestam
 
 export type TransactionStatus = 'pending' | 'failed' | 'success';
 export type TransactionType = 'contribution';
+
+export interface IAppSettings {
+    monthlyReminderMessage: string;
+    sendMonthlyReminders: boolean;
+    monthlyContributionAmount: number;
+}

@@ -6,6 +6,7 @@ import { SmsMessageTransport } from './sms-transport';
 import { RecipientResolver } from './recipient-resolver';
 import { MessageTemplateResolver } from './template-resolver';
 import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver } from './types';
+import { getPreviewUser } from './preview-user';
 
 export interface BulkMessageServiceArgs {
   contextFactory: IMessageContextFactory;
@@ -60,16 +61,7 @@ export class BulkMessageService implements IBulkMessageService {
     async previewMessage(messageTemplate: string): Promise<string> {
         // create a dummy user and generate a preview message
         // based on that user
-
-        const user: IUser = {
-            _id: 'dummy_user',
-            phone: '254700000000',
-            name: 'John Doe',
-            team: "Team",
-            email: "john@mailer.com",
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
+        const user = getPreviewUser();
 
         const message = await this.createMessageForUser(user, messageTemplate);
         return message;

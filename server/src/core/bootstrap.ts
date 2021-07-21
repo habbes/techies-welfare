@@ -1,6 +1,7 @@
 import { MongoClient } from "mongodb";
 import { AppConfig } from "./config";
 import { AtSmsService, BulkMessageService, FlutterwavePaymentProvider, LinkGeneratorService, LocalSmsService, MessageContextFactory, PaymentHandlerRegistry, TransactionService, UserService } from "./services";
+import { AppSettingsService } from "./services/settings/app-settings-service";
 import { IAppServices } from "./types";
 
 export async function bootstrap(config: AppConfig): Promise<IAppServices> {
@@ -17,13 +18,16 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
     paymentHandlers.register(flwPaymentProvider);
     paymentHandlers.setDefault(flwPaymentProvider.name());
 
+    const settings = new AppSettingsService();
+
     const transactions = new TransactionService(db, { paymentHandlers });
-    const users = new UserService(db, { transactions });
+    const users = new UserService(db, { transactions, settings });
 
     const linkGenerator = new LinkGeneratorService({ baseUrl: config.webAppBaseUrl });
     const messageContextFactory = new MessageContextFactory({
         baseUrl: config.webAppBaseUrl,
-        linkGenerator
+        linkGenerator,
+        users
     });
 
     const smsService = config.smsProvider === "at" ?
