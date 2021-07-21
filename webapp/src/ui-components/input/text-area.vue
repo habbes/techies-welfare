@@ -1,8 +1,7 @@
 <template>
   <div class="">
     <label v-if="label" class="block text-sm font-medium mb-1">{{ label }}</label>
-    <input
-      :type="type"
+    <textarea
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       class="inline-flex px-3 py-2 border border-gray-100 rounded-lg shadow-sm
@@ -10,7 +9,7 @@
       :class="classes"
       :placeholder="placeholder"
       :required="required">
-  </div>
+  </textarea>
 </template>
 <script lang="ts">
 import { defineComponent, computed } from "vue";
@@ -18,7 +17,6 @@ import { defineComponent, computed } from "vue";
 export default defineComponent({
   props: {
     label: String,
-    type: String,
     placeholder: String,
     required: Boolean,
     full: Boolean,
