@@ -23,6 +23,17 @@ interface SendMessageArgs {
     message: string;
 }
 
+export interface ManualEntryTransactionData {
+    id: string;
+    fromUser: string;
+    amount: number;
+    metadata: {
+        recordedBy: string;
+        transactionDate: Date;
+        details: string;
+    }
+}
+
 export class ApiClient {
     private httpClient: AxiosInstance;
 
@@ -52,6 +63,11 @@ export class ApiClient {
 
     async initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
         const res = await this.httpClient.post(`/users/${userId}/pay`, { amount, type });
+        return res.data;
+    }
+
+    async addManualPayment(args: ManualEntryTransactionData) {
+        const res = await this.httpClient.post(`/transactions`, args);
         return res.data;
     }
 

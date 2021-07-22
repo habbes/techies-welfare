@@ -43,8 +43,15 @@
                 </div>
             </ui-card>
         </div>
-        <div v-if="transactions.length" class="mt-5">
+        <AddPayment
+            :user="user"
+            class="mt-5"
+            v-show="isAddPaymentPaneOpen"
+            @cancel="closeAddPaymentPane"
+            @addPayment="onAddPayment"/>
+        <div class="mt-5" v-show="!isAddPaymentPaneOpen">
             <ui-h3>Transactions</ui-h3>
+            <ui-button class="mb-5" @click="openAddPaymentPane">Add payment</ui-button>
             <ui-table>
                 <ui-thead>
                     <ui-tr>
@@ -74,13 +81,17 @@
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { apiClient } from "../../../api-client";
+import AddPayment from "./add-payment.vue";
 
 const MONTHLY_CONTRIBUTION = 1000;
 
 export default defineComponent({
+    components: { AddPayment },
     setup() {
         const user = ref();
         const transactions = ref([]);
+        const isAddPaymentPaneOpen = ref(false);
+        const addPaymentPane = ref();
 
         onMounted(async () => {
             const route = useRoute();
@@ -113,11 +124,29 @@ export default defineComponent({
             return arrears;
         });
 
+        function openAddPaymentPane() {
+            isAddPaymentPaneOpen.value = true;
+        }
+        
+        function closeAddPaymentPane() {
+            isAddPaymentPaneOpen.value = false;
+        }
+
+        function onAddPayment(trx) {
+            transactions.value?.unshift(trx);
+            closeAddPaymentPane();
+        }
+
         return {
             user,
             transactions,
             totalContribution,
-            arrears
+            arrears,
+            addPaymentPane,
+            isAddPaymentPaneOpen,
+            openAddPaymentPane,
+            closeAddPaymentPane,
+            onAddPayment
         }
     },
 })

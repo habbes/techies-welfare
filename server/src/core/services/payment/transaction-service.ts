@@ -60,7 +60,7 @@ export class TransactionService implements ITransactionService {
         };
 
         try {
-            const providerResult = await this.handleProviderNotification(provider.name(), args);
+            const providerResult = await provider.handlePaymentNotification(args);
             trxArgs.providerTransactionId = providerResult.providerTransactionId;
             trxArgs.status = providerResult.status;
             trxArgs.metadata = providerResult.metadata;
@@ -137,16 +137,6 @@ export class TransactionService implements ITransactionService {
         }
     }
 
-    async getById(id: string): Promise<ITransaction> {
-        try {
-            const result = await this.collection.findOne({ _id: id });
-            return result;
-        }
-        catch (e) {
-            throw e;
-        }
-    }
-
     async getAllByUser(userId: string): Promise<ITransaction<any>[]> {
         try {
             const result = await this.collection.find({ fromUser: userId }).sort({ createdAt: -1 }).toArray();
@@ -167,7 +157,7 @@ export class TransactionService implements ITransactionService {
         }
     }
 
-    async checkTransactionStatus(transactionId: string): Promise<ITransaction<any>> {
+    async getById(transactionId: string): Promise<ITransaction<any>> {
         try {
             const trx = await this.collection.findOne({ _id: transactionId });
             if (!trx) throw new Error("Transaction not found");
