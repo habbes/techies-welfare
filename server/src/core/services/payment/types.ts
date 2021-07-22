@@ -1,4 +1,5 @@
 import { IUser, ITransaction, TransactionStatus, TransactionType } from "../../models";
+import { ManualEntryTransactionData } from "./manual-entry-provider";
 
 export interface ITransactionService {
     initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction>;
@@ -6,6 +7,7 @@ export interface ITransactionService {
     getAllByUser(userId: string): Promise<ITransaction[]>;
     checkTransactionStatus(transactionId: string): Promise<ITransaction>;
     handleProviderNotification<TPaymentNotification = Record<string, any>>(providerName: string, notification: TPaymentNotification): Promise<ITransaction>;
+    createManualTransaction(args: ManualEntryTransactionData): Promise<ITransaction>;
 }
 
 export interface IPaymentHandler<TProviderMetadata = Record<string, any>, TPaymentNotification = Record<string, any>> {

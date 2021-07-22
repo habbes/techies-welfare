@@ -27,7 +27,8 @@ export interface ITransaction<ProviderMetadata = any> extends HasId, HasTimestam
     metadata: ProviderMetadata;
     status: TransactionStatus;
     type: TransactionType;
-    fromUser?: string;
+    fromUser: string;
+    failureReason?: string;
 }
 
 export type TransactionStatus = 'pending' | 'failed' | 'success';

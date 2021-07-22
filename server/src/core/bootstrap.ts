@@ -1,6 +1,17 @@
 import { MongoClient } from "mongodb";
 import { AppConfig } from "./config";
-import { AtSmsService, BulkMessageService, FlutterwavePaymentProvider, LinkGeneratorService, LocalSmsService, MessageContextFactory, PaymentHandlerRegistry, TransactionService, UserService } from "./services";
+import {
+    AtSmsService,
+    BulkMessageService,
+    FlutterwavePaymentProvider,
+    LinkGeneratorService,
+    LocalSmsService,
+    ManualEntryPaymentProvider,
+    MessageContextFactory,
+    PaymentHandlerRegistry,
+    TransactionService,
+    UserService
+} from "./services";
 import { AppSettingsService } from "./services/settings/app-settings-service";
 import { IAppServices } from "./types";
 
@@ -14,8 +25,11 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
         logoUrl: config.flutterwaveLogoUrl
     });
 
+    const manualPaymentProvider = new ManualEntryPaymentProvider();
+
     const paymentHandlers = new PaymentHandlerRegistry();
     paymentHandlers.register(flwPaymentProvider);
+    paymentHandlers.register(manualPaymentProvider);
     paymentHandlers.setDefault(flwPaymentProvider.name());
 
     const settings = new AppSettingsService();

@@ -22,6 +22,8 @@ router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.p
 
 router.post("/users/:id/pay", wrapResponse(req => req.appServices.users.initiatePayment(req.params.id, req.body)));
 
+router.post("/transactions", wrapResponse(req => req.appServices.transactions.createManualTransaction(req.body)));
+
 router.use(errorHandler());
 router.use(error404handler("Error not found."));
 

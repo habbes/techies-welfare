@@ -2,6 +2,7 @@ import { Collection, Db } from "mongodb";
 import { ITransaction, IUser, TransactionStatus } from "../../models";
 import { generateId } from "../../../util";
 import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
+import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
 
 const COLLECTION = "transactions";
 
@@ -34,6 +35,32 @@ export class TransactionService implements ITransactionService {
 
         try {
             const providerResult = await provider.requestPaymentFromUser(user, amount);
+            trxArgs.providerTransactionId = providerResult.providerTransactionId;
+            trxArgs.status = providerResult.status;
+            trxArgs.metadata = providerResult.metadata;
+
+            const result = await this.create(trxArgs);
+            return result;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
+    async createManualTransaction(args: ManualEntryTransactionData): Promise<ITransaction> {
+        const provider = this.handlers.get(MANUAL_ENTRY_PAYMENT_PROVIDER_NAME);
+
+        const trxArgs: CreateTransactionArgs = {
+            amount: args.amount,
+            fromUser: args.fromUser,
+            type: 'contribution',
+            provider: provider.name(),
+            status: 'pending',
+            metadata: {}
+        };
+
+        try {
+            const providerResult = await this.handleProviderNotification(provider.name(), args);
             trxArgs.providerTransactionId = providerResult.providerTransactionId;
             trxArgs.status = providerResult.status;
             trxArgs.metadata = providerResult.metadata;
