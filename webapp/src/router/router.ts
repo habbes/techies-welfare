@@ -4,6 +4,7 @@ import DashboardHome from "../pages/dashboard/dashboard-home.vue";
 import PaymentPage from "../pages/payment/payment-page.vue";
 import AdminPage from "../pages/admin/admin-page.vue";
 import AdminMembersPage from "../pages/admin/members.vue";
+import AdminAddMemberPage from "../pages/admin/add-member.vue";
 import AdminPaymentsPage from "../pages/admin/payments.vue";
 import AdminMessagingPage from "../pages/admin/messaging.vue";
 
@@ -29,6 +30,11 @@ const router = createRouter({
               path: "/members",
               name: "admin-members",
               component: AdminMembersPage
+            },
+            {
+              path: "/members/new",
+              name: "admin-add-member",
+              component: AdminAddMemberPage
             },
             {
               path: "/messaging",

@@ -2,7 +2,7 @@
     <div>
         <ui-h2>Members</ui-h2>
         <div class="mb-3">
-            <ui-button>Add new member</ui-button>
+            <ui-router-button :to="{ name: 'admin-add-member' }">Add new member</ui-router-button>
         </div>
         <div class="mb-3">
             <ui-text-input full placeholder="Search..." v-model="searchTerm"></ui-text-input>

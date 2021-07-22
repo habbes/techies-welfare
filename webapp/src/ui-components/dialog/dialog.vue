@@ -26,15 +26,18 @@ export default defineComponent({
   props: {
     title: String,
   },
-  setup() {
+  emits: ["open", "close"],
+  setup(props, { emit }) {
     const isOpen = ref(false);
 
     function close() {
       isOpen.value = false;
+      emit("close");
     }
 
     function open() {
       isOpen.value = true;
+      emit("open");
     }
 
     return {

@@ -8,8 +8,10 @@
       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
       :class="classes"
       :placeholder="placeholder"
-      :required="required">
-  </textarea>
+      :required="required"
+      rows="5">
+    </textarea>
+  </div>
 </template>
 <script lang="ts">
 import { defineComponent, computed } from "vue";

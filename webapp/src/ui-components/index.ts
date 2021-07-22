@@ -13,6 +13,6 @@ export function registerUiComponents(app: App): void {
   app.component("ui-card", UiCard);
   app.component("ui-dialog", UiDialog);
   app.component("ui-text-input", UiTextInput);
-  app.component("ui-text-area", UiTextInput);
+  app.component("ui-text-area", UiTextArea);
   app.component("ui-h2", UiH2);
 }
