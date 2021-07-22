@@ -57,7 +57,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { apiClient } from "../../api-client";
+import { apiClient } from "../../../api-client";
 
 export default defineComponent({
     setup() {

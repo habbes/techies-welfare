@@ -137,9 +137,29 @@ export class TransactionService implements ITransactionService {
         }
     }
 
+    async getById(id: string): Promise<ITransaction> {
+        try {
+            const result = await this.collection.findOne({ _id: id });
+            return result;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
     async getAllByUser(userId: string): Promise<ITransaction<any>[]> {
         try {
-            const result = await this.collection.find({ $or: [{ from: userId }, { to: userId }] }).sort({ createdAt: -1 }).toArray();
+            const result = await this.collection.find({ fromUser: userId }).sort({ createdAt: -1 }).toArray();
+            return result;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
+    async getAll(): Promise<ITransaction[]> {
+        try {
+            const result = await this.collection.find({ }).sort({ createdAt: -1 }).toArray();
             return result;
         }
         catch (e) {

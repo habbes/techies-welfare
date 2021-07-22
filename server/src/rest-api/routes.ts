@@ -19,10 +19,12 @@ router.post("/preview-message",  wrapResponse(req =>
 router.post("/users", wrapResponse(req => req.appServices.users.create(req.body)));
 router.get("/users", wrapResponse(req => req.appServices.users.getAll()));
 router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.params.id)));
+router.get("/users/:id/transactions", wrapResponse(req => req.appServices.transactions.getAllByUser(req.params.id)));
 
 router.post("/users/:id/pay", wrapResponse(req => req.appServices.users.initiatePayment(req.params.id, req.body)));
 
 router.post("/transactions", wrapResponse(req => req.appServices.transactions.createManualTransaction(req.body)));
+router.get("/transactions", wrapResponse(req => req.appServices.transactions.getAll()));
 
 router.use(errorHandler());
 router.use(error404handler("Error not found."));

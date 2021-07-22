@@ -3,9 +3,10 @@ import DashboardPage from "../pages/dashboard/dashboard-page.vue";
 import DashboardHome from "../pages/dashboard/dashboard-home.vue";
 import PaymentPage from "../pages/payment/payment-page.vue";
 import AdminPage from "../pages/admin/admin-page.vue";
-import AdminMembersPage from "../pages/admin/members.vue";
-import AdminAddMemberPage from "../pages/admin/add-member.vue";
-import AdminPaymentsPage from "../pages/admin/payments.vue";
+import AdminMembersPage from "../pages/admin/members/members.vue";
+import AdminAddMemberPage from "../pages/admin/members/add-member.vue";
+import AdminMemberDetailsPage from "../pages/admin/members/member-details.vue";
+import AdminPaymentsPage from "../pages/admin/payments/payments.vue";
 import AdminMessagingPage from "../pages/admin/messaging.vue";
 
 const router = createRouter({
@@ -30,6 +31,11 @@ const router = createRouter({
               path: "/members",
               name: "admin-members",
               component: AdminMembersPage
+            },
+            {
+              path: "/members/:id",
+              name: "admin-member-details",
+              component: AdminMemberDetailsPage
             },
             {
               path: "/members/new",

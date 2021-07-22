@@ -35,6 +35,16 @@ export class ApiClient {
         return res.data;
     }
 
+    async getUserById(id: string) {
+        const res = await this.httpClient.get(`/users/${id}`);
+        return res.data;
+    }
+
+    async getUserTransactions(id: string) {
+        const res = await this.httpClient.get(`/users/${id}/transactions`);
+        return res.data;
+    }
+
     async createUser(args: CreateUserArgs) {
         const res = await this.httpClient.post('/users', args);
         return res.data;

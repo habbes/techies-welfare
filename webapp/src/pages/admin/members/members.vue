@@ -8,30 +8,30 @@
             <ui-text-input full placeholder="Search..." v-model="searchTerm"></ui-text-input>
         </div>
         <div class="bg-white">
-            <table class="border-t border-gray-100">
-                <thead>
-                    <th class="first:pl-5 last:pr-5 py-2">Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Team</th>
-                    <th>Member Since</th>
-                </thead>
-                <tbody>
-                    <tr v-for="user in filteredUsers" :key="user._id" class="first:pl-5 last:pr-5 py-5 border-t border-gray-100">
-                        <td class="px-2 rounded-md min-w- bg-white mr-5 text-sm text-gray-700">{{ user.name }}</td>
-                        <td>{{ user.phone }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.team }}</td>
-                        <td>{{ new Date(user.joinedAt||user.createdAt).toDateString() }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <ui-table>
+                <ui-thead>
+                    <ui-th>Name</ui-th>
+                    <ui-th>Phone</ui-th>
+                    <ui-th>Email</ui-th>
+                    <ui-th>Team</ui-th>
+                    <ui-th>Member Since</ui-th>
+                </ui-thead>
+                <ui-tbody>
+                    <ui-tr v-for="user in filteredUsers" :key="user._id">
+                        <ui-td><router-link :to="{ name: 'admin-member-details', params: { id: user._id }}">{{ user.name }}</router-link></ui-td>
+                        <ui-td>{{ user.phone }}</ui-td>
+                        <ui-td>{{ user.email }}</ui-td>
+                        <ui-td>{{ user.team }}</ui-td>
+                        <ui-td>{{ new Date(user.joinedAt||user.createdAt).toDateString() }}</ui-td>
+                    </ui-tr>
+                </ui-tbody>
+            </ui-table>
         </div>
     </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue'
-import { apiClient } from "../../api-client";
+import { apiClient } from "../../../api-client";
 
 export default defineComponent({
     setup() {
