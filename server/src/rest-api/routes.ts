@@ -25,6 +25,8 @@ router.post("/users/:id/pay", wrapResponse(req => req.appServices.users.initiate
 
 router.post("/transactions", wrapResponse(req => req.appServices.transactions.createManualTransaction(req.body)));
 router.get("/transactions", wrapResponse(req => req.appServices.transactions.getAll()));
+router.get("/transactions/provider/:provider/:id",
+    wrapResponse(req => req.appServices.transactions.getByProviderId(req.params.provider, req.params.id)));
 router.get("/transactions/:id", wrapResponse(req => req.appServices.transactions.getById(req.params.id)));
 
 router.use(errorHandler());

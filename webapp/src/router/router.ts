@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import DashboardPage from "../pages/dashboard/dashboard-page.vue";
 import DashboardHome from "../pages/dashboard/dashboard-home.vue";
 import PaymentPage from "../pages/payment/payment-page.vue";
+import FlutterWavePostPaymentPage from "../pages/payment/flutterwave-post-payment.vue";
 import AdminPage from "../pages/admin/admin-page.vue";
 import AdminMembersPage from "../pages/admin/members/members.vue";
 import AdminAddMemberPage from "../pages/admin/members/add-member.vue";
@@ -60,6 +61,11 @@ const router = createRouter({
       path: '/pay',
       component: PaymentPage,
       name: "pay"
+    },
+    {
+      path: '/post-payment/flutterwave',
+      component: FlutterWavePostPaymentPage,
+      name: 'flutterwave-post-payment'
     }
   ]
 });

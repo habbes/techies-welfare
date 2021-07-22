@@ -66,6 +66,11 @@ export class ApiClient {
         return res.data;
     }
 
+    async getTransactionByProviderId(provider: string, providerId: string) {
+        const res = await this.httpClient.get(`/transactions/provider/${provider}/${providerId}`);
+        return res.data;
+    }
+
     async initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
         const res = await this.httpClient.post(`/users/${userId}/pay`, { amount, type });
         return res.data;

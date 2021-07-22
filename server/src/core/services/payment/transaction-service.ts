@@ -187,6 +187,16 @@ export class TransactionService implements ITransactionService {
         }
     }
 
+    async getByProviderId(provider: string, transactionId: string): Promise<ITransaction> {
+        try {
+            const trx = await this.collection.findOne({ provider, providerTransactionId: transactionId });
+            return trx;
+        }
+        catch (e) {
+            throw e;
+        }
+    }
+
     private async create(args: CreateTransactionArgs): Promise<ITransaction> {
         const now = new Date();
         const tx: ITransaction = {
