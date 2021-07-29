@@ -24,3 +24,4 @@
 - [ ] Ability to track payouts
 - [ ] Ability to view current welfare account balance
 - [ ] Documentation to help people get started contributing to and running the project locally
+- [ ] Improve API client to use fluent pattern
