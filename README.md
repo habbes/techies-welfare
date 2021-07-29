@@ -20,3 +20,7 @@
 - [ ] Data validation
 - [ ] Proper error handling
 - [ ] Clean up and improve UI
+- [ ] A member should be able to view their own statements
+- [ ] Ability to track payouts
+- [ ] Ability to view current welfare account balance
+- [ ] Documentation to help people get started contributing to and running the project locally
