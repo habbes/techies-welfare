@@ -1,5 +1,19 @@
 # Techies Welfare Contributions Tracking App
 
+## Setup instructions
+
+Clone the repo:
+
+```
+git clone https://github.com/habbes/techies-welfare.git
+```
+
+- The backend code and instructions to set up and run the server locally
+are located in the [server](./server) directory.
+
+- The client web app code and instructions to run the web app locally are located
+in the [webapp](./webapp) directory.
+
 ## TODO:
 
 - [x] basic scaffold
