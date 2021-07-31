@@ -56,7 +56,7 @@ The server uses a bunch of config variables which are retrieved from environment
 
 You can override the defaults by creating a `.env` file in the `server` root directory and populating the file with the relevant variable-value pairs. Check out the [`env.example`](./env.example) file to see a sample of what the file is supposed to look like.
 
-To learn more about all the different available config options, check the [src/core/config.ts](./src/core/config.ts) source file.
+To learn more about all the different available config options, check the [src/core/config.ts](./src/core/config.ts) source file. Specifically, the `loadAppConfigFromEnv` functions shows which environment variable keys are used to retrieve which values.
 
 If you update your `.env` file, you need to re-run the server for the changes to take effect.
 
