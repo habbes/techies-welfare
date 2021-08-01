@@ -1,27 +1,48 @@
-# Vue 3 + Typescript + Vite
+# Techies Welfare Client App
 
-This template should help get you started developing with Vue 3 and Typescript in Vite.
+This is the client-side web app of the Techies Welfare System.
 
-## Recommended IDE Setup
+## Tech Stack
 
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
+The web app is primarily based on:
+- [Vue.js 3](https://v3.vuejs.org/)
+- [TypeScript](https://www.typescriptlang.org/): for writing type-safe code. See also [Vue 3 Typescript Support](https://v3.vuejs.org/guide/typescript-support.html)
+- [Tailwind CSS](https://tailwindcss.com/): for styling (it's like Bootstrap, but lower-level and easier to customize and compose)
+- [Headless UI](https://headlessui.dev/): for creating custom components with underlying JS behaviour (like dialogs, tabs, pop-overs, etc.)
+- [ViteJS](https://vitejs.dev/): local dev server and build tools
 
-### If Using `<script setup>`
+## Install instructions
 
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
+- Install [Node.js 14+](https://nodejs.org/en/). You might find it more convenient to use the [nvm](https://github.com/nvm-sh/nvm) tool ([nvm-windows](https://github.com/coreybutler/nvm-windows) for Windows) to install and manage different versions of Node.js on your machine.
 
-## Type Support For `.vue` Imports in TS
+Install dependencies:
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
+```
+npm install
+```
 
-### If Using Volar
+## Launch the dev server
 
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
+```
+npm run dev
+```
 
-### If Using Vetur
+This will launch a local server on [http://localhost:3000](http://localhost:3000) to run the web app.
 
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette
-5. Search and run "Select TypeScript version" -> "Use workspace version"
+By default, the web app expects the backend API to be running on port `4000`.
+
+The server will live-reload automatically as you make changes to your frontend code.
+
+## Building the app
+
+```
+npm run build
+```
+
+Will build the production assets and bundle and output them in the `dist` directory.
+
+## Code organization
+
+- The [src](./src) directory contains most of the source code. Therein you'll find more docs about the code architecture and organization.
+- The [public](./public) directory contains public assets like images
+- The [tailwind.config.js](./tailwind.config.js) config file is use to [customize Tailwind's settings](https://tailwindcss.com/docs/configuration).
