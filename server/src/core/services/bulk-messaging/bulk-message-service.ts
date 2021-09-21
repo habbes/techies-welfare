@@ -7,6 +7,7 @@ import { RecipientResolver } from './recipient-resolver';
 import { MessageTemplateResolver } from './template-resolver';
 import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver } from './types';
 import { getPreviewUser } from './preview-user';
+import { createValidationError } from '../..';
 
 export interface BulkMessageServiceArgs {
   contextFactory: IMessageContextFactory;
@@ -25,11 +26,11 @@ export class BulkMessageService implements IBulkMessageService {
 
     constructor(args: BulkMessageServiceArgs) {
         if (!args.recipientResolver && !args.users) {
-            throw new Error('Bulk message args must provide either recipientsResolver or users');
+            throw createValidationError('Bulk message args must provide either recipientsResolver or users');
         }
 
         if (!args.transport && !args.smsService) {
-            throw new Error('Bulk message args must provide either transport or smsProvider');
+            throw createValidationError('Bulk message args must provide either transport or smsProvider');
         }
 
         this.contextFactory = args.contextFactory;
@@ -42,7 +43,7 @@ export class BulkMessageService implements IBulkMessageService {
         // validate recipients
         const invalidGroups = recipientGroups.filter(group => !this.recipientResolver.canResolve(group));
         if (invalidGroups.length) {
-            throw new Error(`Invalid recipients: ${invalidGroups.map(g => `'${g}'`).join(', ')}`);
+            throw createValidationError(`Invalid recipients: ${invalidGroups.map(g => `'${g}'`).join(', ')}`);
         }
 
         const report: BulkMessageReport = {
@@ -116,13 +117,13 @@ export class BulkMessageService implements IBulkMessageService {
         });
         }
         catch (e) {
-        report.errors.push({
-            message: e.message,
-            user: recipient._id,
-            name: recipient.name
-        });
+            report.errors.push({
+                message: e.message,
+                user: recipient._id,
+                name: recipient.name
+            });
 
-        report.numFailed += 1;
+            report.numFailed += 1;
         }
     }
 

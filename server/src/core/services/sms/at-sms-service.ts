@@ -1,5 +1,6 @@
 const createClient = require("africastalking");
 import { SmsService, SendArgs, Client } from "africastalking-types";
+import { createExternalServiceError, rethrowIfAppError } from "../..";
 import { ISmsService } from "./types";
 
 export interface AtSmsServiceArgs {
@@ -35,11 +36,12 @@ export class AtSmsService implements ISmsService {
             const res = await this.service.send(args);
 
             if (res.SMSMessageData.Recipients[0].status !== 'Success') {
-                throw new Error('Failed to send message');
+                throw createExternalServiceError('Failed to send message', 'africastalking');
             }
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createExternalServiceError(e, 'africastalking');
         }
     }
 }

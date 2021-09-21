@@ -1,4 +1,5 @@
 import * as axios from "axios";
+import { createExternalServiceError } from "../..";
 import { generateId } from "../../../util";
 import { IUser, ITransaction, TransactionStatus } from "../../models";
 import { IPaymentHandler, PaymentRequestResult, ProviderTransactionInfo } from "./types";
@@ -58,8 +59,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
             }
         }
         catch (e) {
-            // errors
-            throw e;
+            throw createExternalServiceError(e, FLUTTERWAVE_PROVIDER_NAME);
         }
     }
 
@@ -96,7 +96,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
             return extractTransactionInfo(res.data.data);
         }
         catch(e) {
-            throw e;
+            throw createExternalServiceError(e, FLUTTERWAVE_PROVIDER_NAME);
         }
     }
 }
