@@ -1,4 +1,5 @@
 import { Db, Collection } from "mongodb";
+import { createDbError, rethrowIfAppError, createResourceNotFoundError } from "../..";
 import { generateId } from "../../../util";
 import { ITransaction, IUser, IUserAccountSummary } from "../../models";
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
@@ -38,8 +39,8 @@ export class UserService implements IUserService {
             return result.ops[0];
         }
         catch (err) {
-            // TODO: custom error
-            throw err;
+            rethrowIfAppError(err);
+            throw createDbError(err);
         }
     }
 
@@ -47,13 +48,14 @@ export class UserService implements IUserService {
         try {
             const user = await this.collection.findOne({ _id: id });
             if (!user) {
-                throw new Error("not found");
+                throw createResourceNotFoundError();
             }
 
             return user;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
         }
     }
 
@@ -61,13 +63,14 @@ export class UserService implements IUserService {
         try {
             const user = await this.collection.findOne({ phone });
             if (!user) {
-                throw new Error("not found");
+                throw createResourceNotFoundError();
             }
 
             return user;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
         }
     }
 
@@ -77,7 +80,8 @@ export class UserService implements IUserService {
             return users;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
         }
     }
 
@@ -88,7 +92,8 @@ export class UserService implements IUserService {
             return trx;
         }
         catch (e) {
-            throw e;
+           rethrowIfAppError(e);
+           throw createDbError(e.message);
         }
     }
 
@@ -113,8 +118,9 @@ export class UserService implements IUserService {
 function computeArrears(user: IUser, totalContribution: number, monthlyContribution: number) {
     // arrears computation
     const now = new Date();
-    const yearDiff = now.getFullYear() - user.joinedAt.getFullYear();
-    const monthDiff = (yearDiff * 12) + (now.getMonth() - user.joinedAt.getMonth());
+    const joinedAt = new Date(user.joinedAt);
+    const yearDiff = now.getFullYear() - joinedAt.getFullYear();
+    const monthDiff = (yearDiff * 12) + (now.getMonth() - joinedAt.getMonth());
     const expectedContribution = monthDiff * monthlyContribution;
     const arrears = expectedContribution - totalContribution;
 

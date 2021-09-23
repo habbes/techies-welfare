@@ -3,6 +3,7 @@ import { ITransaction, IUser, TransactionStatus } from "../../models";
 import { generateId } from "../../../util";
 import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
 import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
+import { createResourceNotFoundError, rethrowIfAppError, createDbError } from "../..";
 
 const COLLECTION = "transactions";
 
@@ -43,7 +44,8 @@ export class TransactionService implements ITransactionService {
             return result;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
@@ -69,7 +71,8 @@ export class TransactionService implements ITransactionService {
             return result;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
@@ -95,13 +98,14 @@ export class TransactionService implements ITransactionService {
             });
 
             if (!updatedRes.value) {
-                throw new Error("Unknown transaction");
+                throw createResourceNotFoundError("Unknown transaction");
             }
 
             return updatedRes.value;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            createDbError(e);
         }
     }
     
@@ -133,7 +137,8 @@ export class TransactionService implements ITransactionService {
             return results[0].total;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
@@ -143,7 +148,8 @@ export class TransactionService implements ITransactionService {
             return result;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
@@ -153,14 +159,15 @@ export class TransactionService implements ITransactionService {
             return result;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
     async getById(transactionId: string): Promise<ITransaction<any>> {
         try {
             const trx = await this.collection.findOne({ _id: transactionId });
-            if (!trx) throw new Error("Transaction not found");
+            if (!trx) throw createResourceNotFoundError('Transaction not found');
 
             if (isFinalStatus(trx.status)) {
                 return trx;
@@ -179,11 +186,12 @@ export class TransactionService implements ITransactionService {
                 }
             }, { returnOriginal: false });
             
-            if (!updatedRes.value) throw new Error("Transaction not found");
+            if (!updatedRes.value) throw createResourceNotFoundError("Transaction not found");
             return updatedRes.value;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
@@ -193,7 +201,8 @@ export class TransactionService implements ITransactionService {
             return trx;
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
 
@@ -218,7 +227,8 @@ export class TransactionService implements ITransactionService {
             return res.ops[0];
         }
         catch (e) {
-            throw e;
+            rethrowIfAppError(e);
+            throw createDbError(e);
         }
     }
     

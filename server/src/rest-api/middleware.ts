@@ -1,12 +1,27 @@
 import { RequestHandler, ErrorRequestHandler } from "express";
-import { sendErrorResponse } from "./util";
+import { sendErrorResponse, sendServerError } from "./util";
 import { AppRequest } from "../server";
+import { AppError } from "../core";
 
 export const errorHandler = (): ErrorRequestHandler =>
-    (error: Error, req, res, next) => {
+    (error: AppError, req, res, next) => {
         // TODO: proper logging
         console.log(error);
-        return sendErrorResponse(res, 400, error);
+        switch (error.code) {
+            case 'resourceNotFound':
+                return sendErrorResponse(res, 404, error);
+            case 'uniquenessFailed':
+                return sendErrorResponse(res, 409, error);
+            case 'validationError':
+                return sendErrorResponse(res, 400, error);
+            default:
+                if (error instanceof SyntaxError) {
+                    return sendErrorResponse(res, 400,
+                    `Invalid syntax in request body: ${error.message}`);
+                }
+
+                return sendServerError(res);
+        }
     };
 
 export const error404handler = (message: string): RequestHandler =>
