@@ -13,7 +13,14 @@ import UiTBody from "./table/tbody.vue";
 import UiTH from "./table/th.vue";
 import UiTR from "./table/tr.vue";
 import UiTD from "./table/td.vue";
+import UiDropdown from "./dropdown/dropdown.vue";
+import UiDropdownItem from "./dropdown/dropdown-item.vue";
+import UiChevronDownIcon from "./icons/chevron.vue";
 
+// TODO: registering the components globally
+//  makes auto-complete impossible and increases
+//  chances of error. We should probably
+// just explicitly import each component we need
 export function registerUiComponents(app: App): void {
   app.component("ui-button", UiButton);
   app.component("ui-router-button", UiRouterButton);
@@ -29,4 +36,25 @@ export function registerUiComponents(app: App): void {
   app.component("ui-th", UiTH);
   app.component("ui-tr", UiTR);
   app.component("ui-td", UiTD);
+  app.component("ui-dropdown", UiDropdown);
 }
+
+export {
+  UiButton,
+  UiRouterButton,
+  UiCard,
+  UiDialog,
+  UiTextInput,
+  UiTextArea,
+  UiH2,
+  UiH3,
+  UiTable,
+  UiTHead,
+  UiTBody,
+  UiTH,
+  UiTR,
+  UiTD,
+  UiDropdown,
+  UiDropdownItem,
+  UiChevronDownIcon
+};

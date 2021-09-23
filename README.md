@@ -32,7 +32,7 @@ in the [webapp](./webapp) directory.
 - [ ] Authentication
 - [ ] User roles and permissions
 - [ ] Data validation
-- [ ] Proper error handling
+- [x] Proper error handling
 - [ ] Clean up and improve UI
 - [ ] A member should be able to view their own statements
 - [ ] Ability to track payouts
