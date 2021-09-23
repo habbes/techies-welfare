@@ -7,12 +7,15 @@ export interface HasTimestamps {
     updatedAt: Date;
 }
 
+export type Role = 'admin' | 'treasurer' | 'member';
+
 export interface IUser extends HasId, HasTimestamps {
     name: string;
     team: string;
     phone: string;
     email: string;
     joinedAt: Date;
+    roles: Role[];
 }
 
 export interface IUserAccountSummary {
