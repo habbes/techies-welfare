@@ -8,7 +8,8 @@ module.exports = {
         sans: ['Rubik', 'sans-serif']
       },
       fontSize: {
-        sm: ['10px', '10px'],
+        xs: ['10px', '10px'],
+        sm: ['12px', '12px'],
         base: ['14px', '20px'],
         lg: ['18px', '34px'],
         xl: ['24px', '34px']
