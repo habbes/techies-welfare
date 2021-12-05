@@ -9,6 +9,7 @@ import AdminAddMemberPage from "../pages/admin/members/add-member.vue";
 import AdminMemberDetailsPage from "../pages/admin/members/member-details.vue";
 import AdminPaymentsPage from "../pages/admin/payments/payments.vue";
 import AdminMessagingPage from "../pages/admin/messaging.vue";
+import AuthResponse from "../pages/auth/auth-response.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -66,6 +67,11 @@ const router = createRouter({
       path: '/post-payment/flutterwave',
       component: FlutterWavePostPaymentPage,
       name: 'flutterwave-post-payment'
+    },
+    {
+      path: '/auth-response',
+      component: AuthResponse,
+      name: 'auth-response'
     }
   ]
 });

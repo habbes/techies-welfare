@@ -3,6 +3,7 @@ import App from './App.vue'
 import "./styles/index.css"
 import { router } from "./router/router";
 import { registerUiComponents } from "./ui-components";
+import { authService } from "./auth";
 
 const app = createApp(App);
 app.use(router);

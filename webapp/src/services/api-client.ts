@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { IAuthService } from "./auth";
 
 interface InitiatePaymentArgs {
     userId: string;
@@ -37,8 +38,23 @@ export interface ManualEntryTransactionData {
 export class ApiClient {
     private httpClient: AxiosInstance;
 
-    constructor(baseUrl: string) {
+    constructor(baseUrl: string, authService: IAuthService) {
         this.httpClient = axios.create({ baseURL: baseUrl });
+
+        this.httpClient.interceptors.request.use(async (config) => {
+            if (authService.isAuthenticated()) {
+                const accessToken = await authService.getAccessToken();
+                const { headers: existingHeaders } = config;
+                const newHeaders = {
+                    ...existingHeaders,
+                    Authorization: `Bearer ${accessToken}`
+                };
+
+                return { ...config, headers: newHeaders };
+            }
+
+            return config;
+        })
     }
 
     async getAllUsers() {

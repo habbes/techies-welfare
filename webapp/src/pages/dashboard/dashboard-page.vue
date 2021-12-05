@@ -21,7 +21,7 @@
                     <UiDropdownItem :route="{ name: 'admin' }">
                         Admin dashboard
                     </UiDropdownItem>
-                    <UiDropdownItem>
+                    <UiDropdownItem @click="logout">
                         Sign out
                     </UiDropdownItem>
                 </UiDropdown>
@@ -35,11 +35,19 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { UiChevronDownIcon, UiDropdown, UiDropdownItem } from "../../ui-components";
+import { authService } from "../../auth";
 
 export default defineComponent({
     components: { UiChevronDownIcon, UiDropdown, UiDropdownItem },
     setup() {
         
+        async function logout() {
+            await authService.logout();
+        }
+
+        return {
+            logout
+        };
     },
 })
 </script>

@@ -15,3 +15,30 @@
         </div>
     </div>
 </template>
+<script lang="ts">
+import { defineComponent, onMounted } from 'vue'
+import { authService } from "../../auth";
+
+export default defineComponent({
+    setup() {
+        onMounted(async () => {
+            if (!authService.isAuthenticated()) {
+                console.log("loggin in");
+                try {
+                    await authService.login();
+                    console.log("Login success");
+                }
+                catch (err) {
+                    console.error("Login error", err);
+                }
+            }
+            else {
+                const token = await authService.getAccessToken();
+                console.log('token', token);
+            }
+
+            
+        })
+    },
+})
+</script>
