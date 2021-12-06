@@ -9,7 +9,7 @@ export const previewMessage = makeCommand<string, string, ICommandContext>((mess
 
 export const notifyUsers = makeCommand<BulkMessageSendArgs, BulkMessageReport, ICommandContext>((args, context) => {
     return context.services.bulkMessages.send(args);
-}, [requireScopes('Messages.Preview')]);
+}, [requireScopes('Messages.Broadcast')]);
 
 export const createUser = makeCommand((args: CreateUserArgs, context: ICommandContext) => {
     return context.services.users.create(args)
