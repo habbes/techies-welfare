@@ -4,3 +4,6 @@ export * from "./types";
 export * from "./config";
 export * from "./bootstrap";
 export * from "./error";
+export * from "./infra";
+export * from "./auth";
+export * from "./commands";

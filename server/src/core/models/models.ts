@@ -18,6 +18,11 @@ export interface IUser extends HasId, HasTimestamps {
     roles: Role[];
 }
 
+export interface IAuthContext {
+    user: IUser;
+    scopes: string[];
+}
+
 export interface IUserAccountSummary {
     totalContribution: number;
     arrears: number;

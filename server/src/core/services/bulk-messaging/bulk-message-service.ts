@@ -8,6 +8,7 @@ import { MessageTemplateResolver } from './template-resolver';
 import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver } from './types';
 import { getPreviewUser } from './preview-user';
 import { createValidationError } from '../..';
+import { BulkMessageSendArgs } from '.';
 
 export interface BulkMessageServiceArgs {
   contextFactory: IMessageContextFactory;
@@ -39,9 +40,9 @@ export class BulkMessageService implements IBulkMessageService {
         this.transport = args.transport || new SmsMessageTransport({ smsService: args.smsService });
     }
 
-    async send(recipientGroups: string[], messageTemplate: string): Promise<BulkMessageReport> {
+    async send({ recipients, message }: BulkMessageSendArgs): Promise<BulkMessageReport> {
         // validate recipients
-        const invalidGroups = recipientGroups.filter(group => !this.recipientResolver.canResolve(group));
+        const invalidGroups = recipients.filter(group => !this.recipientResolver.canResolve(group));
         if (invalidGroups.length) {
             throw createValidationError(`Invalid recipients: ${invalidGroups.map(g => `'${g}'`).join(', ')}`);
         }
@@ -53,8 +54,8 @@ export class BulkMessageService implements IBulkMessageService {
             recipients: []
         };
 
-        const allRecipients = await this.getRecipients(recipientGroups, report);
-        await this.sendToRecipients(allRecipients, messageTemplate, report);
+        const allRecipients = await this.getRecipients(recipients, report);
+        await this.sendToRecipients(allRecipients, message, report);
 
         return report;
     }

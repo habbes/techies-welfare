@@ -1,7 +1,7 @@
 import { IUser } from "../../models";
 
 export interface IBulkMessageService {
-    send(recipients: string[], messageTemplate: string): Promise<BulkMessageReport>;
+    send(args: BulkMessageSendArgs): Promise<BulkMessageReport>;
     previewMessage(messageTemplate: string): Promise<string>;
 }
 
@@ -20,6 +20,11 @@ export interface IRecipientResolver {
 
 export interface IMessageTransport {
     sendMessage(recipient: IUser, message: string): Promise<void>;
+}
+
+export interface BulkMessageSendArgs {
+    recipients: string[];
+    message: string;
 }
 
 export interface BulkMessageReport {

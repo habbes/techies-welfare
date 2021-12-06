@@ -43,7 +43,10 @@ export type AppErrorCode =
     | 'uniquenessFailed'
     | 'validationError'
     // external API error
-    | 'externalServiceError';
+    | 'externalServiceError'
+    // permissionDenied
+    | 'permissionDenied';
+
 
 
 
@@ -77,4 +80,7 @@ export const createValidationError =
 export const createExternalServiceError =
     (message: ErrorMessage, serviceName: string) =>
         createAppError(`Service ${serviceName}: ${getErrorMessage(message)}`, 'externalServiceError');
+
+export const createPermissionError =
+    (message: ErrorMessage = 'Permission denied') => createAppError(message, 'permissionDenied');
 

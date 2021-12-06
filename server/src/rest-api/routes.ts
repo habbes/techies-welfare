@@ -1,23 +1,21 @@
 import { Express, Router } from "express";
+import { createUser, getUsers, notifyUsers, previewMessage } from "../core";
 import { error404handler, errorHandler, wrapResponse } from "./middleware";
 
 const router = Router();
 
-interface BulkMessageRequest {
-    recipients: string[];
-    message: string;
-}
-
-router.post("/notify-users",  wrapResponse(req => {
-    const body = req.body as BulkMessageRequest;
-    return req.appServices.bulkMessages.send(body.recipients, body.message)
-}));
+router.post("/notify-users",  wrapResponse(req =>
+    req.commands.execute(notifyUsers, req.body)));
 
 router.post("/preview-message",  wrapResponse(req => 
-    req.appServices.bulkMessages.previewMessage(req.body.message).then(message => ({ message }))));
+    req.commands.execute(previewMessage, req.body.message).then(message => ({ message }))));
 
-router.post("/users", wrapResponse(req => req.appServices.users.create(req.body)));
-router.get("/users", wrapResponse(req => req.appServices.users.getAll()));
+router.post("/users", wrapResponse(req => 
+    req.commands.execute(createUser, req.body)));
+
+router.get("/users", wrapResponse(req =>
+    req.commands.execute(getUsers, undefined)));
+
 router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.params.id)));
 router.get("/users/:id/transactions", wrapResponse(req => req.appServices.transactions.getAllByUser(req.params.id)));
 
