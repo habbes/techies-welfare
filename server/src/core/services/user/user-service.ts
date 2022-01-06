@@ -1,7 +1,7 @@
 import { Db, Collection } from "mongodb";
 import { createDbError, rethrowIfAppError, createResourceNotFoundError } from "../..";
 import { generateId } from "../../../util";
-import { ITransaction, IUser, IUserAccountSummary } from "../../models";
+import { ITransaction, IUser, IUserAccountSummary, Role } from "../../models";
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
 import { IAppSettingsService } from "../settings/types";
 import { CreateUserArgs, IUserService } from "./types";
@@ -31,7 +31,8 @@ export class UserService implements IUserService {
             _id: generateId(),
             createdAt: now,
             updatedAt: now,
-            joinedAt: args.joinedAt || now
+            joinedAt: args.joinedAt || now,
+            roles: ['member'] as Role[]
         };
 
         try {

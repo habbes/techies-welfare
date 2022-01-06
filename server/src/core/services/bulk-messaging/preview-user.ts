@@ -9,7 +9,8 @@ export function getPreviewUser(): IUser {
         email: "john@mailer.com",
         createdAt: new Date(),
         updatedAt: new Date(),
-        joinedAt: new Date(2021, 0, 1)
+        joinedAt: new Date(2021, 0, 1),
+        roles: ['member']
    }
 }
 
