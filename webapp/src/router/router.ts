@@ -10,6 +10,7 @@ import AdminMemberDetailsPage from "../pages/admin/members/member-details.vue";
 import AdminPaymentsPage from "../pages/admin/payments/payments.vue";
 import AdminMessagingPage from "../pages/admin/messaging.vue";
 import AuthResponse from "../pages/auth/auth-response.vue";
+import LoginPage from "../pages/auth/login.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -23,6 +24,11 @@ const router = createRouter({
           path: "/",
           component: DashboardHome,
           name: "dashboard-home"
+        },
+        {
+          path: "/auth/login",
+          component: LoginPage,
+          name: 'login'
         },
         {
           path: "/admin",

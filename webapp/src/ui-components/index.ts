@@ -1,10 +1,12 @@
 import { App } from "vue";
+import UiLayout from "./layout/layout.vue";
 import UiButton from "./button/button.vue";
 import UiRouterButton from "./button/router-button.vue";
 import UiCard from "./card/card.vue";
 import UiDialog from "./dialog/dialog.vue";
 import UiTextInput from "./input/text-input.vue";
 import UiTextArea from "./input/text-area.vue";
+import UiInputGroup from "./input/input-group.vue";
 import UiH2 from "./headings/h2.vue";
 import UiH3 from "./headings/h3.vue";
 import UiTable from "./table/table.vue";
@@ -40,10 +42,12 @@ export function registerUiComponents(app: App): void {
 }
 
 export {
+  UiLayout,
   UiButton,
   UiRouterButton,
   UiCard,
   UiDialog,
+  UiInputGroup,
   UiTextInput,
   UiTextArea,
   UiH2,
