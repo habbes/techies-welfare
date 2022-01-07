@@ -18,6 +18,12 @@ export interface IUser extends HasId, HasTimestamps {
     roles: Role[];
 }
 
+export interface IAuthToken extends HasId, HasTimestamps {
+    expiresAt: Date;
+    user: string;
+    scopes: string[];
+}
+
 export interface IAuthContext {
     user: IUser;
     scopes: string[];

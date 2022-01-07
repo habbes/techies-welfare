@@ -1,20 +1,41 @@
 import { Express, Router } from "express";
-import { createUser, getUsers, notifyUsers, previewMessage } from "../core";
-import { error404handler, errorHandler, wrapResponse } from "./middleware";
+import {
+    createUser,
+    getUsers,
+    getMe,
+    login,
+    logout,
+    logoutAll,
+    notifyUsers,
+    previewMessage
+} from "../core";
+import { error404handler, errorHandler, requireAuth, wrapResponse } from "./middleware";
 
 const router = Router();
 
-router.post("/notify-users",  wrapResponse(req =>
+router.post("/notify-users", requireAuth(), wrapResponse(req =>
     req.commands.execute(notifyUsers, req.body)));
 
-router.post("/preview-message",  wrapResponse(req => 
+router.post("/preview-message", requireAuth(), wrapResponse(req => 
     req.commands.execute(previewMessage, req.body.message).then(message => ({ message }))));
 
-router.post("/users", wrapResponse(req => 
+router.post("/users", /* requireAuth(), */ wrapResponse(req => 
     req.commands.execute(createUser, req.body)));
 
-router.get("/users", wrapResponse(req =>
+router.get("/users", requireAuth(), wrapResponse(req =>
     req.commands.execute(getUsers, undefined)));
+
+router.get("/me", requireAuth(), wrapResponse(req =>
+    req.commands.execute(getMe, undefined)))
+    
+router.post("/auth/login", wrapResponse(req =>
+    req.commands.execute(login, req.body)));
+
+router.post("/auth/logout", requireAuth(), wrapResponse(req =>
+    req.commands.execute(logout, req.accessToken)));
+
+router.post("/auth/logout-all", requireAuth(), wrapResponse(req =>
+    req.commands.execute(logoutAll, undefined)));
 
 router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.params.id)));
 router.get("/users/:id/transactions", wrapResponse(req => req.appServices.transactions.getAllByUser(req.params.id)));

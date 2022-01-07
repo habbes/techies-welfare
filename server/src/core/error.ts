@@ -45,7 +45,8 @@ export type AppErrorCode =
     // external API error
     | 'externalServiceError'
     // permissionDenied
-    | 'permissionDenied';
+    | 'permissionDenied'
+    | 'authError';
 
 
 
@@ -84,3 +85,11 @@ export const createExternalServiceError =
 export const createPermissionError =
     (message: ErrorMessage = 'Permission denied') => createAppError(message, 'permissionDenied');
 
+export const createAuthError =
+    (message: ErrorMessage) => createAppError(message, 'authError');
+
+export const createInvalidTokenError =
+    () => createAuthError('Invalid token');
+
+export const createInvalidLoginError =
+    () => createAuthError('Invalid login or password');

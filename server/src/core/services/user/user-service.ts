@@ -1,12 +1,43 @@
 import { Db, Collection } from "mongodb";
-import { createDbError, rethrowIfAppError, createResourceNotFoundError } from "../..";
-import { generateId } from "../../../util";
-import { ITransaction, IUser, IUserAccountSummary, Role } from "../../models";
+import { LoginArgs, LoginResult } from "./types";
+import {
+    createDbError,
+    rethrowIfAppError,
+    createResourceNotFoundError,
+    createInvalidTokenError,
+    createInvalidLoginError
+} from "../../error";
+import { generateId, generateToken, hashPassword, verifyPassword } from "../../../util";
+import { IAuthToken, ITransaction, IUser, IUserAccountSummary, Role } from "../../models";
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
 import { IAppSettingsService } from "../settings/types";
 import { CreateUserArgs, IUserService } from "./types";
 
 export const COLLECTION = "users";
+const TOKEN_COLLECTION = "auth_tokens";
+const TOKEN_VALIDITY_MILLIS = 2 * 24 * 3600 * 1000; // 2 days
+
+type SafeUserProjection = Record<keyof IUser, number>;
+
+/**
+ * used to ensure sensitive details are not leaked
+ * from the database
+ */
+const SAFE_USER_PROJECTION: SafeUserProjection = {
+    _id: 1,
+    email: 1,
+    name: 1,
+    phone: 1,
+    team: 1,
+    roles: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    joinedAt: 1
+};
+
+interface IStoredUser extends IUser {
+    password: string;
+}
 
 export interface UserServiceArgs {
     transactions: ITransactionService;
@@ -14,30 +45,34 @@ export interface UserServiceArgs {
 }
 
 export class UserService implements IUserService {
-    private collection: Collection<IUser>;
+    private collection: Collection<IStoredUser>;
+    private tokenCollection: Collection<IAuthToken>;
     private transactions: ITransactionService;
     private settings: IAppSettingsService;
 
     constructor(db: Db, args: UserServiceArgs) {
         this.collection = db.collection(COLLECTION);
+        this.tokenCollection = db.collection(TOKEN_COLLECTION);
         this.transactions = args.transactions;
         this.settings = args.settings;
     }
 
     async create(args: CreateUserArgs): Promise<IUser> {
         const now = new Date();
+        const password = await hashPassword(args.password);
         const input = {
             ...args,
             _id: generateId(),
             createdAt: now,
             updatedAt: now,
             joinedAt: args.joinedAt || now,
-            roles: ['member'] as Role[]
+            roles: ['member'] as Role[],
+            password
         };
 
         try {
             const result = await this.collection.insertOne(input);
-            return result.ops[0];
+            return getSafeUser(result.ops[0]);
         }
         catch (err) {
             rethrowIfAppError(err);
@@ -47,7 +82,7 @@ export class UserService implements IUserService {
 
     async getById(id: string): Promise<IUser> {
         try {
-            const user = await this.collection.findOne({ _id: id });
+            const user = await this.collection.findOne({ _id: id }, { projection: SAFE_USER_PROJECTION });
             if (!user) {
                 throw createResourceNotFoundError();
             }
@@ -62,7 +97,7 @@ export class UserService implements IUserService {
 
     async getByPhone(phone: string): Promise<IUser> {
         try {
-            const user = await this.collection.findOne({ phone });
+            const user = await this.collection.findOne({ phone }, { projection: SAFE_USER_PROJECTION });
             if (!user) {
                 throw createResourceNotFoundError();
             }
@@ -77,11 +112,69 @@ export class UserService implements IUserService {
 
     async getAll(): Promise<IUser[]> {
         try {
-            const users = await this.collection.find({}).toArray();
+            const users = await this.collection.find({}, { projection: SAFE_USER_PROJECTION }).toArray();
             return users;
         }
         catch (e) {
             rethrowIfAppError(e);
+            throw createDbError(e.message);
+        }
+    }
+
+    async login(args: LoginArgs): Promise<LoginResult> {
+        try {
+            const user = await this.collection.findOne(
+                { $or: [{ phone: args.login }, { email: args.login }] });
+            
+            if (!user) throw createInvalidLoginError();
+
+            // TODO: if password not provided, verify TAN code
+            const passwordCorrect = await verifyPassword(user.password, args.password);
+            if (!passwordCorrect) throw createInvalidLoginError();
+
+            const token = await this.createAuthToken(user._id);
+
+            return {
+                token,
+                user: getSafeUser(user)
+            };
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e);
+        }
+    }
+
+    async getByToken(tokenId: string): Promise<IUser> {
+        try {
+            const token = await this.tokenCollection.findOne({ _id: tokenId, expiresAt:  { $gt: new Date() }});
+            if (!token) throw createInvalidTokenError();
+
+            const user = await this.collection.findOne({ _id: token.user }, { projection: SAFE_USER_PROJECTION });
+            if (!user) throw createInvalidTokenError();
+
+            return user;
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
+        }
+    }
+
+    async logout(token: string): Promise<void> {
+        try {
+            await this.tokenCollection.deleteOne({ _id: token });
+        }
+        catch (e) {
+            throw createDbError(e.message)
+        }
+    }
+
+    async logoutAll(user: string): Promise<void> {
+        try {
+            await this.tokenCollection.deleteMany({ user })
+        }
+        catch (e) {
             throw createDbError(e.message);
         }
     }
@@ -114,6 +207,28 @@ export class UserService implements IUserService {
             arrears
         };
     }
+
+    private async createAuthToken(user: string): Promise<IAuthToken> {
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + TOKEN_VALIDITY_MILLIS);
+        const token = {
+            _id: generateToken(),
+            createdAt: now,
+            updatedAt: now,
+            expiresAt,
+            user,
+            scopes: [] as string[]
+        };
+
+        try {
+            const res = await this.tokenCollection.insertOne(token);
+            return res.ops[0];
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
+        }
+    }
 }
 
 function computeArrears(user: IUser, totalContribution: number, monthlyContribution: number) {
@@ -127,3 +242,20 @@ function computeArrears(user: IUser, totalContribution: number, monthlyContribut
 
     return arrears;
 }
+
+/**
+ * removes fields that should
+ * not be shared from the user
+ * @param user 
+ */
+ function getSafeUser(user: IStoredUser): IUser {
+    const userDict: any = user;
+    return Object.keys(SAFE_USER_PROJECTION)
+      .reduce<any>((safeUser, field) => {
+        if (field in user) {
+          safeUser[field] = userDict[field];
+        }
+  
+        return safeUser;
+      }, {});
+  }

@@ -1,10 +1,10 @@
 import { Response } from "express";
-import { ErrorMessage, getErrorMessage } from "../core";
+import { AppError, getErrorMessage, createAppError } from "../core";
 
-export function createErrorResponse(error: ErrorMessage) {
+export function createErrorResponse(error: AppError) {
     return {
         message: getErrorMessage(error),
-        code: "appError" // TODO use AppError code
+        code: error.code
     }
 }
 
@@ -12,10 +12,10 @@ export function createErrorResponse(error: ErrorMessage) {
 * creates a default server error response body
 */
 export const createServerError = () => {
-    return createErrorResponse("Server error occurred");
+    return createErrorResponse(createAppError("Server error occurred", "appError"));
 };
 
-export function sendErrorResponse(res: Response, status: number, error: string|Error) {
+export function sendErrorResponse(res: Response, status: number, error: AppError) {
     return res.status(status).send(createErrorResponse(error));
 }
 

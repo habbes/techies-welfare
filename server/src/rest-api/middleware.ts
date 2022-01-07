@@ -1,7 +1,29 @@
 import { RequestHandler, ErrorRequestHandler } from "express";
 import { sendErrorResponse, sendServerError } from "./util";
 import { AppRequest } from "../server";
-import { AppError } from "../core";
+import { AppError, createInvalidTokenError, createValidationError, createResourceNotFoundError } from "../core";
+
+export const requireAuth = (): RequestHandler =>
+    async (req: AppRequest, res, next) => {
+        const token = req.get('Authorization')?.split(/\s+/g)[1] || '';
+        if (!token) {
+            const err = createInvalidTokenError();
+            return next(err);
+        }
+        try {
+            const user = await req.appServices.users.getByToken(token);
+            req.accessToken = token;
+            req.authContext = {
+                user,
+                scopes: [] as string[] // TODO: load scopes from token
+            };
+
+            next();
+        }
+        catch (e) {
+            return next(e);
+        }
+    }
 
 export const errorHandler = (): ErrorRequestHandler =>
     (error: AppError, req, res, next) => {
@@ -14,10 +36,14 @@ export const errorHandler = (): ErrorRequestHandler =>
                 return sendErrorResponse(res, 409, error);
             case 'validationError':
                 return sendErrorResponse(res, 400, error);
+            case 'authError':
+                return sendErrorResponse(res, 401, error);
+            case 'permissionDenied':
+                return sendErrorResponse(res, 403, error);
             default:
                 if (error instanceof SyntaxError) {
                     return sendErrorResponse(res, 400,
-                    `Invalid syntax in request body: ${error.message}`);
+                    createValidationError(`Invalid syntax in request body: ${error.message}`));
                 }
 
                 return sendServerError(res);
@@ -25,7 +51,7 @@ export const errorHandler = (): ErrorRequestHandler =>
     };
 
 export const error404handler = (message: string): RequestHandler =>
-    (req, res) => sendErrorResponse(res, 404, message);
+    (req, res) => sendErrorResponse(res, 404, createResourceNotFoundError(message));
 
 interface WrappedHandler {
     (req: AppRequest): Promise<any>;
