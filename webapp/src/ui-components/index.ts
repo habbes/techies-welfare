@@ -15,6 +15,7 @@ import UiTBody from "./table/tbody.vue";
 import UiTH from "./table/th.vue";
 import UiTR from "./table/tr.vue";
 import UiTD from "./table/td.vue";
+import UiText from "./text/text.vue";
 import UiDropdown from "./dropdown/dropdown.vue";
 import UiDropdownItem from "./dropdown/dropdown-item.vue";
 import UiChevronDownIcon from "./icons/chevron.vue";
@@ -60,5 +61,6 @@ export {
   UiTD,
   UiDropdown,
   UiDropdownItem,
-  UiChevronDownIcon
+  UiChevronDownIcon,
+  UiText,
 };
