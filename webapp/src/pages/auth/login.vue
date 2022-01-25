@@ -3,12 +3,22 @@
         <div class="border-t-8 border-secondary">
             <div class="bg-white py-12 px-8 border rounded-b-sm" style="border-color:#e4eaf4" box-shadow="inset 0px 6px 0px #095cA5">
                 <UiH2>User login</UiH2>
-                <form>
+                <form @submit.prevent="submitLogin">
                     <UiInputGroup>
-                        <UiTextInput label="Email address" />
+                        <UiTextInput
+                            v-model="login"
+                            label="Email or Phone"
+                            placeholder="john@mailer.com or 722111222"
+                            required 
+                        />
                     </UiInputGroup>
                     <UiInputGroup>
-                        <UiTextInput label="Password" password />
+                        <UiTextInput
+                            v-model="password"
+                            label="Password"
+                            password
+                            required
+                        />
                     </UiInputGroup>
                     <UiInputGroup>
                         <UiLayout justify="end">
@@ -22,7 +32,13 @@
   </UiLayout>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { useRouter } from 'vue-router';
+import { apiClient } from "../../api-client";
+import { authService } from "../../auth";
+import { LocalAuthService } from '../../services';
+import { useUser } from "../../store";
+
 import {
     UiH2,
     UiText,
@@ -42,7 +58,33 @@ export default defineComponent({
         UiLayout
     },
     setup() {
-        
+        const login = ref("");
+        const password = ref("");
+        const router = useRouter();
+
+        async function submitLogin() {
+            try {
+                const result = await apiClient.login({ login: login.value, password: password.value });
+                (authService as LocalAuthService).setAccessToken(result.token._id);
+
+                login.value = "";
+                password.value = "";
+
+                useUser().user.value = result.user;
+
+                router.push({ name: "dashboard" });
+            }
+            catch (e) {
+                // TODO: proper error handling
+                alert(e.message);
+            }
+        }
+
+        return {
+            login,
+            password,
+            submitLogin
+        }
     },
 })
 </script>

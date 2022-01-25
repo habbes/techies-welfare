@@ -1,6 +1,7 @@
-import { IAuthService, MsalAuthService } from "./services";
+import { useRouter } from "vue-router";
+import { IAuthService, MsalAuthService, LocalAuthService } from "./services";
 
-const msalConfig = {
+/* const msalConfig = {
     auth: {
         clientId: '58b64109-904a-4592-bd20-3c8660e6e5b8',
         authority: 'https://login.microsoftonline.com/techieswelfare.onmicrosoft.com',
@@ -14,6 +15,9 @@ const scopes = [
     'openid',
     'profile'
 ];
+*/
 
-export const authService: IAuthService = new MsalAuthService(msalConfig, scopes);
+export const authService: IAuthService = new LocalAuthService(() => {
+    useRouter().push("/auth/login");
+});
 

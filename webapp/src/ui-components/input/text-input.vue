@@ -6,7 +6,8 @@
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       class="inline-flex px-3 py-2 border border-tertiary-light rounded-sm shadow-sm h-8
-      focus:border-primary focus:outline-none"
+      focus:border-primary focus:outline-none text-secondary"
+      style="font-size:14px"
       :class="classes"
       :placeholder="placeholder"
       :required="required">

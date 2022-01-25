@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IAuthService } from "./auth";
 
 interface InitiatePaymentArgs {
@@ -13,6 +13,22 @@ interface CreateUserArgs {
     phone: string;
     joinedAt: Date;
     team: string;
+}
+
+interface LoginArgs {
+    login: string;
+    password: string;
+}
+
+interface LoginResult {
+    user: {
+        _id: string;
+        name: string;
+        roles: string[];
+    };
+    token: {
+        _id: string;
+    }
 }
 
 interface PreviewMessageArgs {
@@ -57,53 +73,57 @@ export class ApiClient {
         })
     }
 
-    async getAllUsers() {
-        const res = await this.httpClient.get('/users');
-        return res.data;
+    getAllUsers() {
+        return getData(this.httpClient.get('/users'));
     }
 
-    async getUserById(id: string) {
-        const res = await this.httpClient.get(`/users/${id}`);
-        return res.data;
+    getUserById(id: string) {
+        return getData(this.httpClient.get(`/users/${id}`));
     }
 
-    async getUserTransactions(id: string) {
-        const res = await this.httpClient.get(`/users/${id}/transactions`);
-        return res.data;
+    getUserTransactions(id: string) {
+        return getData(this.httpClient.get(`/users/${id}/transactions`));
     }
 
-    async createUser(args: CreateUserArgs) {
-        const res = await this.httpClient.post('/users', args);
-        return res.data;
+    createUser(args: CreateUserArgs) {
+        return getData(this.httpClient.post('/users', args));
     }
 
-    async getAllTransactions() {
-        const res = await this.httpClient.get('/transactions');
-        return res.data;
+    login(args: LoginArgs): Promise<LoginResult> {
+        return getData(this.httpClient.post('/auth/login', args));
     }
 
-    async getTransactionByProviderId(provider: string, providerId: string) {
-        const res = await this.httpClient.get(`/transactions/provider/${provider}/${providerId}`);
-        return res.data;
+    getAllTransactions() {
+        return getData(this.httpClient.get('/transactions'));
     }
 
-    async initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
-        const res = await this.httpClient.post(`/users/${userId}/pay`, { amount, type });
-        return res.data;
+    getTransactionByProviderId(provider: string, providerId: string) {
+        return getData(this.httpClient.get(`/transactions/provider/${provider}/${providerId}`));
     }
 
-    async addManualPayment(args: ManualEntryTransactionData) {
-        const res = await this.httpClient.post(`/transactions`, args);
-        return res.data;
+    initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
+        return getData(this.httpClient.post(`/users/${userId}/pay`, { amount, type }));
     }
 
-    async previewMessage(args: PreviewMessageArgs) {
-        const res = await this.httpClient.post('/preview-message', args);
-        return res.data;
+    addManualPayment(args: ManualEntryTransactionData) {
+        return getData(this.httpClient.post(`/transactions`, args));
     }
 
-    async sendMessage(args: SendMessageArgs) {
-        const res = await this.httpClient.post('/notify-users', args);
-        return res.data;
+    previewMessage(args: PreviewMessageArgs) {
+        return getData(this.httpClient.post('/preview-message', args));
+    }
+
+    sendMessage(args: SendMessageArgs) {
+        return getData(this.httpClient.post('/notify-users', args));
+    }
+}
+
+async function getData<T = any>(responsePromise: Promise<AxiosResponse<T>>): Promise<T> {
+    try {
+        const response = await responsePromise;
+        return response.data;
+    }
+    catch (e: any) {
+        throw e.response.data;
     }
 }

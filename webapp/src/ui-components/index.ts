@@ -9,6 +9,8 @@ import UiTextArea from "./input/text-area.vue";
 import UiInputGroup from "./input/input-group.vue";
 import UiH2 from "./headings/h2.vue";
 import UiH3 from "./headings/h3.vue";
+import UiSidebar from "./sidebar/sidebar.vue";
+import UiSidebarLayout from "./layout/sidebar-layout.vue";
 import UiTable from "./table/table.vue";
 import UiTHead from "./table/thead.vue";
 import UiTBody from "./table/tbody.vue";
@@ -53,6 +55,8 @@ export {
   UiTextArea,
   UiH2,
   UiH3,
+  UiSidebar,
+  UiSidebarLayout,
   UiTable,
   UiTHead,
   UiTBody,

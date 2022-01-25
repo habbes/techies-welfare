@@ -1,25 +1,26 @@
 <template>
-    <div class="flex-1 flex items-stretch px-5 py-5 text-sm">
-        <div class="bg-dark rounded-md w-32 shadow-sm text-white py-5 flex flex-col items-center justify-between">
-            <div class="flex flex-col gap-6">
+    <UiSidebarLayout>
+        <template #sidebar>
+            <UiSidebar>
                 <router-link to="/">Home</router-link>
                 <router-link to="/">Requests</router-link>
                 <router-link to="/">Reports</router-link>
-            </div>
-            <div>
-                <router-link to="/">Help</router-link>
-            </div>
-        </div>
-        <div class="flex-1 py-8 px-20">
-            <router-view></router-view>
-        </div>
-    </div>
+
+                <template #footer>
+                    <router-link to="/">Help</router-link>
+                </template>
+            </UiSidebar>
+        </template>
+        <router-view></router-view>
+    </UiSidebarLayout>
 </template>
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue'
 import { authService } from "../../auth";
+import { UiSidebar, UiSidebarLayout } from "../../ui-components";
 
 export default defineComponent({
+    components: { UiSidebar, UiSidebarLayout },
     setup() {
         onMounted(async () => {
             if (!authService.isAuthenticated()) {

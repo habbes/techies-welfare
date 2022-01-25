@@ -5,12 +5,12 @@
                 <router-link to="/"><img src="/img/logo.png" alt="Logo" style="width:100px" /></router-link>
             </div>
             <div class="flex gap-3">
-                <UiDropdown>
+                <UiDropdown v-if="user">
                     <template #activator>
                         <div class="flex items-center">
                             <div class="flex-col mr-3">
-                                <div class="text-base">Justin</div>
-                                <div class="text-sm text-secondary-light">Administrator</div>
+                                <div class="text-base">{{ user.name }}</div>
+                                <div class="text-sm text-secondary-light">{{ user.roles[0] }}</div>
                             </div>
                             <span class="text-secondary-light"><ui-chevron-down-icon class="cursor-pointer" width="18" height="18"/></span>
                         </div>
@@ -34,19 +34,26 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { useRouter } from "vue-router";
 import { UiChevronDownIcon, UiDropdown, UiDropdownItem } from "../../ui-components";
 import { authService } from "../../auth";
+import { useUser, clearSession } from "../../store";
 
 export default defineComponent({
     components: { UiChevronDownIcon, UiDropdown, UiDropdownItem },
     setup() {
+        const router = useRouter();
+        const user = useUser().user;
         
         async function logout() {
             await authService.logout();
+            clearSession();
+            router.push({ name: "dashboard" });
         }
 
         return {
-            logout
+            logout,
+            user
         };
     },
 })
