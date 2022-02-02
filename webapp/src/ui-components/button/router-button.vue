@@ -1,24 +1,18 @@
 <template>
   <router-link
-    class="rounded-md inline-flex justify-center bg-indigo-500 text-white px-3 py-2 hover:bg-indigo-700 disabled:opacity-50"
     :class="classes"
   >
     <slot></slot>
   </router-link>
 </template>
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent } from "vue";
+import { getButtonThemeClasses, getButtonBasePropsDefinition } from "./button-helpers";
 
 export default defineComponent({
-  props: {
-    full: Boolean,
-  },
+  props: getButtonBasePropsDefinition(),
   setup(props) {
-    const classes = computed(() => {
-      return {
-        "w-full": props.full
-      }
-    });
+    const classes = getButtonThemeClasses(props);
 
     return {
       classes
