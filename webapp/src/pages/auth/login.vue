@@ -72,7 +72,12 @@ export default defineComponent({
 
                 useUser().user.value = result.user;
 
-                router.push({ name: "dashboard" });
+                if (router.currentRoute.value.query.redirect) {
+                    router.push(router.currentRoute.value.query.redirect as string)
+                }
+                else {
+                    router.push({ name: "dashboard-home" });
+                }
             }
             catch (e) {
                 // TODO: proper error handling
