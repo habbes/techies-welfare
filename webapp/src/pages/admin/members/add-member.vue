@@ -1,45 +1,78 @@
 <template>
     <div>
         <div class="flex gap-3">
-            <router-link :to="{ name: 'admin-members' }">&lt;</router-link> <ui-h2>Add Member</ui-h2>
+            <router-link :to="{ name: 'admin-members' }"></router-link> <ui-h2>Add Member</ui-h2>
         </div>
-        <div>
-            <form @submit.prevent="openDialog" class="w-1/2">
-                <ui-text-input
-                    v-model="name"
-                    label="Name"
-                    full
-                    required
-                    class="mb-3"/>
-                <ui-text-input
-                    v-model="email"
-                    label="Email"
-                    type="email"
-                    full required
-                    class="mb-3" />
-                <ui-text-input
-                    v-model="phone"
-                    label="Phone"
-                    type="tel"
-                    placeholder="2547xxxxxxxx"
-                    full required
-                    class="mb-3" />
-                <ui-text-input
-                    v-model="team"
-                    label="Team"
-                    full
-                    required
-                    class="mb-3"/>
-                <ui-text-input
-                    v-model="joinedAt"
-                    label="Date Joined"
-                    type="date"
-                    full
-                    required
-                    class="mb-3" />
-                <ui-button submit>Register member</ui-button>
+        <UiCard>
+            <form @submit.prevent="openDialog" class="w-full">
+                <UiH3>Member Info</UiH3>
+                <UiGridLayout :cols="3" :gap="3">
+                    <ui-text-input
+                        v-model="name"
+                        label="Name"
+                        full
+                        required
+                        class="mb-3"/>
+                    <ui-text-input
+                        v-model="email"
+                        label="Email"
+                        type="email"
+                        full required
+                        class="mb-3" />
+                    <ui-text-input
+                        label="ID Number"
+                        type="text"
+                        full
+                        class="mb-3" />
+                    <ui-text-input
+                        v-model="phone"
+                        label="Phone"
+                        type="tel"
+                        placeholder="2547xxxxxxxx"
+                        full required
+                        class="mb-3" />
+                    <ui-text-input
+                        v-model="team"
+                        label="Team"
+                        full
+                        class="mb-3"/>
+                    <ui-text-input
+                        v-model="joinedAt"
+                        label="Date Joined"
+                        type="date"
+                        full
+                        required
+                        class="mb-3" />
+                    <ui-text-input
+                        v-model="status"
+                        label="Status"
+                        full
+                        class="mb-3"/>
+                </UiGridLayout>
+
+                <UiH3>Next of kin details</UiH3>
+
+                <UiGridLayout :cols="3" :gap="3" class="mb-3">
+                    <UiTextInput
+                        label="Next of kin name"
+                        full/>
+                    <UiTextInput
+                        label="Email address"
+                        full/>
+                    <UiTextInput
+                        label="Phone number"
+                        full/>
+                    <UiTextInput
+                        label="Relationship"
+                        full/>
+                </UiGridLayout>
+
+                <UiLayout class="gap-3">
+                    <ui-button submit>Save</ui-button>
+                    <ui-button secondary>Cancel</ui-button>
+                </UiLayout>
             </form>
-        </div>
+        </UiCard>
         <ui-dialog ref="dialog" title="Confirm new member details">
             <div>
                 <div>Name: <span class="font-mono font-semibold">{{ name }}</span></div>
@@ -48,23 +81,36 @@
                 <div>Email: <span class="font-mono font-semibold">{{ team }}</span></div>
                 <div>Date Joined: <span class="font-mono font-semibold">{{ new Date(joinedAt).toLocaleDateString() }}</span></div>
             </div>
-            <div class="mt-3 flex justify-end gap-3">
-                <ui-button @click="registerUser">Proceed to register member</ui-button>
-                <ui-button @click="closeDialog">Cancel</ui-button>
-            </div>
+            <UiLayout class="mt-3 gap-3">
+                <UiButton @click="registerUser" primary>Proceed to register member</UiButton>
+                <UiButton @click="closeDialog" secondary>Cancel</UiButton>
+            </UiLayout>
         </ui-dialog>
     </div>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { apiClient } from "../../../api-client";
+import { UiButton, UiGridLayout, UiLayout, UiDialog, UiTextInput, UiH2, UiH3, UiCard } from "../../../ui-components";
+
 
 export default defineComponent({
+    components: {
+        UiButton,
+        UiLayout,
+        UiGridLayout,
+        UiDialog,
+        UiTextInput,
+        UiH2,
+        UiH3,
+        UiCard
+    },
     setup() {
-        const name = ref('');
-        const phone = ref('');
-        const email = ref('');
+        const name = ref('f');
+        const phone = ref('2');
+        const email = ref('s@s.com');
         const team = ref('');
+        const status = ref('');
         const joinedAt = ref(getDefaultDateString());
         const dialog = ref();
 
@@ -114,6 +160,7 @@ export default defineComponent({
             phone,
             team,
             email,
+            status,
             joinedAt,
             openDialog,
             closeDialog,

@@ -14,7 +14,8 @@ export default defineComponent({
         vertical: Boolean,
         fill: Boolean,
         justify: String as PropType<Justify>,
-        align: String as PropType<Align>
+        align: String as PropType<Align>,
+        gap: Number
     },
     setup(props) {
 
@@ -32,6 +33,7 @@ export default defineComponent({
             "items-end": props.align === 'end',
             "items-stretch": props.align === 'stretch',
             "items-baseline": props.align === 'baseline',
+            [`gap-${props.gap}`]: props.gap !== undefined,
         }));
 
         return {
