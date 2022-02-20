@@ -22,6 +22,7 @@ export class TransactionService implements ITransactionService {
 
     async initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction<any>> {
         const amount = Math.floor(args.amount);
+        console.log('amount', args.amount);
 
         const provider = this.handlers.getDefault();
 

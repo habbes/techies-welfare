@@ -85,6 +85,14 @@ export class ApiClient {
         return getData(this.httpClient.get(`/me`));
     }
 
+    getMyTransactions() {
+        return getData(this.httpClient.get('/me/transactions'));
+    }
+
+    initiateMyPayment({ amount, type = 'contribution' }: { amount: number, type: string }) {
+        return getData(this.httpClient.post('/me/pay', { amount, type }));
+    }
+
     getUserTransactions(id: string) {
         return getData(this.httpClient.get(`/users/${id}/transactions`));
     }

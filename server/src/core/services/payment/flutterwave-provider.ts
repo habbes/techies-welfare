@@ -26,7 +26,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
             redirect_url: this.args.redirectUrl,
             customer: {
                 email: user.email,
-                phone_number: convertPhoneNumberToFlwFormat(user.phone),
+                phonenumber: convertPhoneNumberToFlwFormat(user.phone),
                 name: user.name
             },
             customizations: {
@@ -37,7 +37,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
             meta: {
                 userId: user._id
             }
-        }
+        };
 
         try {
             const res = await axios.default.post<FlutterwaveInitiatePaymentResponse>(

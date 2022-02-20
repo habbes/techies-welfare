@@ -1,6 +1,7 @@
 import { RouteRecordRaw } from "vue-router";
 import DashboardPage from "../pages/dashboard/dashboard-page.vue";
 import DashboardHome from "../pages/dashboard/dashboard-home.vue";
+import ContributionsPage from "../pages/dashboard/contributions-page.vue";
 import PaymentPage from "../pages/payment/payment-page.vue";
 import FlutterWavePostPaymentPage from "../pages/payment/flutterwave-post-payment.vue";
 import AdminPage from "../pages/admin/admin-page.vue";
@@ -21,7 +22,14 @@ export const routes: RouteRecordRaw[] = [
             {
                 path: "/",
                 component: DashboardHome,
-                name: "dashboard-home"
+                name: "dashboard-home",
+                children: [
+                    {
+                        path: "",
+                        name: "contributions",
+                        component: ContributionsPage
+                    }
+                ]
             },
             {
                 path: "/auth/login",

@@ -1,28 +1,36 @@
 <template>
-    <ui-card class="w-1/3 mx-auto mt-14">
-        <p v-if="verifying">
-            Verifying transaction. Please wait...
-        </p>
-        <p v-if="cancelled">
-            Transaction was cancelled.
-        </p>
-        <p v-if="transaction && transaction.status === 'pending'">
-            Transaction is still pending. Refresh the page after a few minutes to check again...
-        </p>
-        <p v-if="transaction && transaction.status === 'failed'" class="text-red-400">
-            Transaction failed: {{ transaction.failureReason }}
-        </p>
-        <p v-if="transaction && transaction.status === 'success'" class="text-green-400">
-            Success: Ksh {{ transaction.amount }} was successffully received.
-        </p>
-    </ui-card>
+    <UiCard class="w-1/3 mx-auto mt-14">
+        <UiLayout vertical>
+            <UiText v-if="verifying">
+                Verifying transaction. Please wait...
+            </UiText>
+            <UiText v-else-if="cancelled">
+                Transaction was cancelled.
+            </UiText>
+            <UiText v-else-if="transaction && transaction.status === 'pending'">
+                Transaction is still <b>pending</b>. Refresh the page after a few minutes to check again...
+            </UiText>
+            <UiText v-else-if="transaction && transaction.status === 'failed'" danger>
+                Transaction failed: {{ transaction.failureReason }}
+            </UiText>
+            <UiText v-else-if="transaction && transaction.status === 'success'" success>
+                Success: Ksh {{ transaction.amount }} was successfully received.
+            </UiText>
+
+            <UiLayout class="mt-5">
+                <UiRouterButton to="/" secondary>Back to home page.</UiRouterButton>
+            </UiLayout>
+        </UiLayout>
+    </UiCard>
 </template>
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRoute } from "vue-router";
 import { apiClient } from "../../api-client";
+import { UiCard, UiRouterButton, UiLayout, UiText } from "../../ui-components";
 
 export default defineComponent({
+    components: { UiRouterButton, UiCard, UiLayout, UiText },
     setup() {
         const verifying = ref(true);
         const transaction = ref({});

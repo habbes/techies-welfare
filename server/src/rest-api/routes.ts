@@ -7,11 +7,22 @@ import {
     logout,
     logoutAll,
     notifyUsers,
-    previewMessage
+    previewMessage,
+    getMyTransactions,
+    initiateTransaction
 } from "../core";
-import { error404handler, errorHandler, injectAppCommands, requireAuth, wrapResponse } from "./middleware";
+import { requireAuth, wrapResponse } from "./middleware";
 
 const router = Router();
+
+router.post("/auth/login", wrapResponse(req =>
+    req.commands.execute(login, req.body)));
+
+router.post("/auth/logout", requireAuth(), wrapResponse(req =>
+    req.commands.execute(logout, req.accessToken)));
+
+router.post("/auth/logout-all", requireAuth(), wrapResponse(req =>
+    req.commands.execute(logoutAll, undefined)));
 
 router.post("/notify-users", requireAuth(), wrapResponse(req =>
     req.commands.execute(notifyUsers, req.body)));
@@ -26,16 +37,13 @@ router.get("/users", requireAuth(), wrapResponse(req =>
     req.commands.execute(getUsers, undefined)));
 
 router.get("/me", requireAuth(), wrapResponse(req =>
-    req.commands.execute(getMe, undefined)))
-    
-router.post("/auth/login", wrapResponse(req =>
-    req.commands.execute(login, req.body)));
+    req.commands.execute(getMe, undefined)));
 
-router.post("/auth/logout", requireAuth(), wrapResponse(req =>
-    req.commands.execute(logout, req.accessToken)));
+router.get("/me/transactions", requireAuth(), wrapResponse(req =>
+    req.commands.execute(getMyTransactions, undefined)));
 
-router.post("/auth/logout-all", requireAuth(), wrapResponse(req =>
-    req.commands.execute(logoutAll, undefined)));
+router.post("/me/pay", requireAuth(), wrapResponse(req =>
+    req.commands.execute(initiateTransaction, req.body)));
 
 router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.params.id)));
 router.get("/users/:id/transactions", wrapResponse(req => req.appServices.transactions.getAllByUser(req.params.id)));

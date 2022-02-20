@@ -5,7 +5,6 @@ import { ICommandContext } from "./types";
 
 export function requireScopes<TInput>(...scopes: Permission[]): ICommandMiddleware<TInput, ICommandContext> {
     return (input, context) => {
-        console.log('resolve scopes', scopes, context.authContext);
         if (!(context.authContext && context.authContext.scopes)) {
             throw createPermissionError();
         }

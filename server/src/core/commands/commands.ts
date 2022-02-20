@@ -1,7 +1,7 @@
 import { makeCommand } from "../infra";
 import { ICommandContext } from "./types";
 import { requireScopes } from "./middleware";
-import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, LoginArgs } from "../services";
+import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs } from "../services";
 
 export const previewMessage = makeCommand<string, string, ICommandContext>((message, context) => {
     return context.services.bulkMessages.previewMessage(message);
@@ -35,3 +35,19 @@ export const logoutAll = makeCommand((_, context: ICommandContext) =>
 export const getMe = makeCommand((_, context: ICommandContext) =>
     Promise.resolve(context.authContext.user),
     [requireScopes('Users.Read.Self')]);
+
+export const getMyTransactions = makeCommand((_, context: ICommandContext) =>
+    context.services.users.getTransactions(context.authContext.user._id),
+    [requireScopes('Transactions.Read.Self')]);
+
+export const initiateTransaction = makeCommand((args: InitiatePaymentArgs, context: ICommandContext) =>
+    context.services.users.initiatePayment(context.authContext.user._id, args),
+    [requireScopes('Transactions.Initiate.Self')]);
+
+export const getUserTransactions = makeCommand((user: string, context: ICommandContext) =>
+    context.services.users.getTransactions(user),
+    [requireScopes('Transactions.Read.All')]);
+
+export const getTransactions = makeCommand((_, context: ICommandContext) =>
+    context.services.transactions.getAll(),
+    [requireScopes('Transactions.Read.All')]);
