@@ -1,3 +1,5 @@
+import { Role, Permission } from "../auth";
+
 export interface HasId {
     _id: string;
 }
@@ -14,14 +16,12 @@ export interface HasCreatedBy {
 export type CreatedByType = "user" | "system";
 export type CreatedBy = { type: CreatedByType, _id?: string };
 
-export type Role = 'admin' | 'treasurer' | 'member';
-
 export interface IUser extends HasId, HasTimestamps, HasCreatedBy {
     name: string;
     team: string;
     phone: string;
     email: string;
-    idNumber: string;
+    idNumber?: string;
     status: UserStatus;
     nextOfKin?: IUserNextOfKin,
     memberSince: Date;
@@ -40,7 +40,7 @@ export interface IUserNextOfKin {
 export interface IAuthToken extends HasId, HasTimestamps {
     expiresAt: Date;
     user: string;
-    scopes: string[];
+    scopes: Permission[];
 }
 
 export interface IAuthContext {

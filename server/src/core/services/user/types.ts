@@ -1,3 +1,4 @@
+import { Permission } from '../../auth';
 import { ITransaction, IUser, IAuthToken, IUserAccountSummary, IUserNextOfKin, UserStatus, CreatedBy } from '../../models';
 import { InitiatePaymentArgs } from '../payment';
 
@@ -7,7 +8,7 @@ export interface IUserService {
     getByPhone(phone: string): Promise<IUser>;
     getAll(): Promise<IUser[]>;
     login(args: LoginArgs): Promise<LoginResult>;
-    getByToken(tokenId: string): Promise<IUser>;
+    getByToken(tokenId: string): Promise<GetByTokenResult>;
     logout(token: string): Promise<void>
     logoutAll(user: string): Promise<void>
     initiatePayment(id: string, args: InitiatePaymentArgs): Promise<ITransaction>;
@@ -39,3 +40,7 @@ export interface LoginResult {
     token: IAuthToken;
     user: IUser;
 };
+
+export interface GetByTokenResult extends IUser {
+    scopes: Permission[];
+}

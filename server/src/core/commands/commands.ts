@@ -14,7 +14,7 @@ export const notifyUsers = makeCommand<BulkMessageSendArgs, BulkMessageReport, I
 export const createUser = makeCommand((args: CreateUserArgs, context: ICommandContext) => {
     return context.services.users.create(args,
         { type: "user", _id: context.authContext.user._id });
-}, [/* requireScopes('Users.Create') */]);
+}, [requireScopes('Users.Create')]);
 
 export const getUsers = makeCommand((_, context: ICommandContext) => {
     return context.services.users.getAll();

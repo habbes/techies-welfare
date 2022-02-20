@@ -1,28 +1,57 @@
 import { RequestHandler, ErrorRequestHandler } from "express";
 import { sendErrorResponse, sendServerError } from "./util";
 import { AppRequest } from "../server";
-import { AppError, createInvalidTokenError, createValidationError, createResourceNotFoundError } from "../core";
+import { AppError, createInvalidTokenError, createValidationError, createResourceNotFoundError, IAppServices, CommandManager } from "../core";
 
-export const requireAuth = (): RequestHandler =>
+export function injectAppServices(services: IAppServices): RequestHandler {
+    return (req: AppRequest, res, next) => {
+        req.appServices = services;
+        next();
+    };
+}
+
+export function injectAppCommands(): RequestHandler {
+    return (req: AppRequest, res, next) => {
+        const executor = new CommandManager(() => ({ services: req.appServices, authContext: req.authContext })).getExecutor();
+        req.commands = executor;
+        next();
+    };
+}
+
+export const authenticate = (): RequestHandler =>
     async (req: AppRequest, res, next) => {
         const token = req.get('Authorization')?.split(/\s+/g)[1] || '';
         if (!token) {
-            const err = createInvalidTokenError();
-            return next(err);
+            // we don't assume authentication is required here
+            // that will be handled by the requireAuth middleware
+            return next();
         }
+
         try {
             const user = await req.appServices.users.getByToken(token);
             req.accessToken = token;
             req.authContext = {
                 user,
-                scopes: [] as string[] // TODO: load scopes from token
+                scopes: user.scopes
             };
 
             next();
         }
         catch (e) {
+            // if a token is provided, but is invalid, we return
+            // an error whether or not the request requires authentication
             return next(e);
         }
+    }
+
+export const requireAuth = (): RequestHandler =>
+    async (req: AppRequest, res, next) => {
+        if (!req.authContext) {
+            const err = createInvalidTokenError();
+            return next(err);
+        }
+
+        return next();
     }
 
 export const errorHandler = (): ErrorRequestHandler =>

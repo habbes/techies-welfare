@@ -7,9 +7,9 @@ async function startServer() {
     try {
         const config = loadAppConfigFrom(process.env);
         const app = await bootstrap(config);
-        const server = createServer(app);
+        const server = createServer();
 
-        mountRestApi(server, "/api");
+        mountRestApi(server, "/api", app);
 
         mountFlutterwaveWebhooks(server, config.flutterwaveWebhooksRoot);
 

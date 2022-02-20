@@ -5,13 +5,16 @@ import {
     rethrowIfAppError,
     createResourceNotFoundError,
     createInvalidTokenError,
-    createInvalidLoginError
+    createInvalidLoginError,
+    isMongoDuplicateKeyError,
+    createUniquenessFailedError
 } from "../../error";
 import { generateId, generateToken, hashPassword, verifyPassword } from "../../../util";
-import { CreatedBy, IAuthToken, ITransaction, IUser, IUserAccountSummary, Role } from "../../models";
+import { getDefaultScopesForRole, Role } from "../../auth";
+import { CreatedBy, IAuthToken, ITransaction, IUser, IUserAccountSummary } from "../../models";
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
-import { IAppSettingsService } from "../settings/types";
-import { CreateUserArgs, IUserService } from "./types";
+import { IAppSettingsService } from "../settings";
+import { CreateUserArgs, IUserService, GetByTokenResult } from "./types";
 
 export const COLLECTION = "users";
 const TOKEN_COLLECTION = "auth_tokens";
@@ -83,6 +86,14 @@ export class UserService implements IUserService {
             return getSafeUser(result.ops[0]);
         }
         catch (err) {
+            if (isMongoDuplicateKeyError(err, 'email')) {
+                throw createUniquenessFailedError('Email already registered.');
+            }
+
+            if (isMongoDuplicateKeyError(err, 'phone')) {
+                throw createUniquenessFailedError('Phone number already registered.');
+            }
+
             rethrowIfAppError(err);
             throw createDbError(err);
         }
@@ -140,7 +151,7 @@ export class UserService implements IUserService {
             const passwordCorrect = await verifyPassword(user.password, args.password);
             if (!passwordCorrect) throw createInvalidLoginError();
 
-            const token = await this.createAuthToken(user._id);
+            const token = await this.createAuthToken(user);
 
             return {
                 token,
@@ -153,7 +164,7 @@ export class UserService implements IUserService {
         }
     }
 
-    async getByToken(tokenId: string): Promise<IUser> {
+    async getByToken(tokenId: string): Promise<GetByTokenResult> {
         try {
             const token = await this.tokenCollection.findOne({ _id: tokenId, expiresAt:  { $gt: new Date() }});
             if (!token) throw createInvalidTokenError();
@@ -161,7 +172,7 @@ export class UserService implements IUserService {
             const user = await this.collection.findOne({ _id: token.user }, { projection: SAFE_USER_PROJECTION });
             if (!user) throw createInvalidTokenError();
 
-            return user;
+            return { ...user, scopes: token.scopes };
         }
         catch (e) {
             rethrowIfAppError(e);
@@ -216,16 +227,17 @@ export class UserService implements IUserService {
         };
     }
 
-    private async createAuthToken(user: string): Promise<IAuthToken> {
+    private async createAuthToken(user: IUser): Promise<IAuthToken> {
         const now = new Date();
         const expiresAt = new Date(now.getTime() + TOKEN_VALIDITY_MILLIS);
+        const scopes = getDefaultScopesForRole(user.roles);
         const token = {
             _id: generateToken(),
             createdAt: now,
             updatedAt: now,
             expiresAt,
-            user,
-            scopes: [] as string[]
+            user: user._id,
+            scopes
         };
 
         try {

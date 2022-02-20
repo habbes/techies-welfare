@@ -9,7 +9,7 @@ import {
     notifyUsers,
     previewMessage
 } from "../core";
-import { error404handler, errorHandler, requireAuth, wrapResponse } from "./middleware";
+import { error404handler, errorHandler, injectAppCommands, requireAuth, wrapResponse } from "./middleware";
 
 const router = Router();
 
@@ -19,7 +19,7 @@ router.post("/notify-users", requireAuth(), wrapResponse(req =>
 router.post("/preview-message", requireAuth(), wrapResponse(req => 
     req.commands.execute(previewMessage, req.body.message).then(message => ({ message }))));
 
-router.post("/users", /* requireAuth(), */ wrapResponse(req => 
+router.post("/users", requireAuth(), wrapResponse(req => 
     req.commands.execute(createUser, req.body)));
 
 router.get("/users", requireAuth(), wrapResponse(req =>
@@ -47,8 +47,5 @@ router.get("/transactions", wrapResponse(req => req.appServices.transactions.get
 router.get("/transactions/provider/:provider/:id",
     wrapResponse(req => req.appServices.transactions.getByProviderId(req.params.provider, req.params.id)));
 router.get("/transactions/:id", wrapResponse(req => req.appServices.transactions.getById(req.params.id)));
-
-router.use(errorHandler());
-router.use(error404handler("Error not found."));
 
 export { router };

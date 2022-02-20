@@ -69,11 +69,11 @@ export const createDbError =
 export const createDbConnectionError =
     (message: ErrorMessage) => createAppError(message, 'dbConnectionError');
 
-export const uniquenessFailedError =
+export const createUniquenessFailedError =
     (message: ErrorMessage) => createAppError(message, 'uniquenessFailed');
 
 export const createResourceNotFoundError =
-    (message: ErrorMessage = 'Resource not found') => createAppError(message, 'uniquenessFailed');
+    (message: ErrorMessage = 'Resource not found') => createAppError(message, 'resourceNotFound');
 
 export const createValidationError =
     (message: ErrorMessage) => createAppError(message, 'validationError');

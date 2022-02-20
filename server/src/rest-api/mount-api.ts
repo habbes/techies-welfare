@@ -1,6 +1,8 @@
 import { Express } from "express";
-import { router } from "./routes";
+import { IAppServices } from "../core";
+import { createRouter } from "./router";
 
-export function mountRestApi(server: Express, apiRoot: string) {
+export function mountRestApi(server: Express, apiRoot: string, services: IAppServices) {
+    const router = createRouter(services);
     server.use(apiRoot, router);
 }
