@@ -27,13 +27,14 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { useRoute } from "vue-router";
 import { apiClient } from "../../api-client";
+import { useUser } from "../../store";
 import { UiCard, UiRouterButton, UiLayout, UiText } from "../../ui-components";
 
 export default defineComponent({
     components: { UiRouterButton, UiCard, UiLayout, UiText },
     setup() {
         const verifying = ref(true);
-        const transaction = ref({});
+        const transaction = ref<any>({});
         const cancelled = ref(false);
 
         onMounted(async () => {
@@ -41,6 +42,15 @@ export default defineComponent({
             if (txId) {
                 try {
                     transaction.value = await apiClient.getTransactionByProviderId('flutterwave', txId);
+                    if (transaction.value.status === 'success') {
+                        // refresh account summary if transaction is successful
+                        // so arrears and total contribution counts can be updated
+                        const userStore = useUser();
+                        if (userStore.exists && userStore.user.value._id === transaction.fromUser) {
+                            const summary =  await apiClient.getMyAccountSummary();
+                            userStore.updateAccountSummary(summary);
+                        }
+                    }
                 }
                 catch (e) {
                     alert(e.message);
@@ -61,9 +71,9 @@ export default defineComponent({
 
             if (query.resp) {
                 try {
-                const response = JSON.parse(query.resp as string);
-                const txRef = response?.tx?.txRef;
-                return txRef;
+                    const response = JSON.parse(query.resp as string);
+                    const txRef = response?.tx?.txRef;
+                    return txRef;
                 }
                 catch (e) {} // eslint-disable-line no-empty
             }

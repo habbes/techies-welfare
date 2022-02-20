@@ -23,20 +23,18 @@ export default defineComponent({
 
         onMounted(async () => {
             if (!authService.isAuthenticated()) {
-                console.log("loggin in");
                 try {
                     await authService.login();
-                    console.log("Login success");
                 }
                 catch (err) {
-                    console.error("Login error", err);
                 }
             }
             else {
-                const token = await authService.getAccessToken();
                 const user = await apiClient.getLoggedInUser();
-                useUser().setUser(user);
-                console.log('token', token, 'user', user);
+                const accountSummary = await apiClient.getMyAccountSummary();
+                const userStore = useUser();
+                userStore.setUser(user);
+                userStore.updateAccountSummary(accountSummary);
             }
         });
         

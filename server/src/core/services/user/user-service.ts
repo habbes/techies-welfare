@@ -261,6 +261,7 @@ function computeArrears(user: IUser, totalContribution: number, monthlyContribut
     // arrears computation
     const now = new Date();
     const joinedAt = new Date(user.memberSince);
+    console.log('Arrears', joinedAt);
     const yearDiff = now.getFullYear() - joinedAt.getFullYear();
     const monthDiff = (yearDiff * 12) + (now.getMonth() - joinedAt.getMonth());
     const expectedContribution = monthDiff * monthlyContribution;

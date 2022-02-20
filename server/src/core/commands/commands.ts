@@ -44,9 +44,17 @@ export const initiateTransaction = makeCommand((args: InitiatePaymentArgs, conte
     context.services.users.initiatePayment(context.authContext.user._id, args),
     [requireScopes('Transactions.Initiate.Self')]);
 
+export const getMyAccountSummary = makeCommand((_, context: ICommandContext) =>
+    context.services.users.getAccountSummary(context.authContext.user._id),
+    [requireScopes('Transactions.Read.Self', 'Users.Read.Self')]);
+
 export const getUserTransactions = makeCommand((user: string, context: ICommandContext) =>
     context.services.users.getTransactions(user),
     [requireScopes('Transactions.Read.All')]);
+
+export const getUserAccountSummary = makeCommand((user: string, context: ICommandContext) =>
+    context.services.users.getAccountSummary(user),
+    [requireScopes('Transactions.Read.All', 'Users.Read.All')]);
 
 export const getTransactions = makeCommand((_, context: ICommandContext) =>
     context.services.transactions.getAll(),

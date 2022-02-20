@@ -1,24 +1,31 @@
 <template>
-    <div>
+    <UiLayout vertical>
         <UiLayout justify="between">
             <UiLayout>
                 <UiH2>My contributions</UiH2>
             </UiLayout>
-            <div class="">
+            <UiLayout align="center" gap="3">
+                <UiLayout gap="3" v-if="accountSummary">
+                    <div><UiText class="font-semibold">Total contribution:</UiText> Ksh {{ accountSummary.totalContribution }}</div>
+                    <div><UiText class="font-semibold">Arrears:</UiText> Ksh {{ accountSummary.arrears }}</div>
+                </UiLayout>
                 <UiButton primary @click="openPaymentDialog">Make contribution</UiButton>
-            </div>
+            </UiLayout>
         </UiLayout>
-        <UiLayout>
+        <UiLayout vertical>
             <TransactionsTable :transactions="transactions" />
         </UiLayout>
         <PaymentDialog ref="paymentDialog" />
-    </div>
+    </UiLayout>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { apiClient } from "../../api-client";
+import { useUser } from "../../store";
 import {
-    UiLayout, UiText, UiH2, UiLink, UiTextInput, UiButton, UiTable, UiTH, UiTHead, UiTD, UiTR, UiTBody
+    UiLayout, UiText, UiH2, UiLink,
+    UiTextInput, UiButton, UiTable,
+    UiTH, UiTHead, UiTD, UiTR, UiTBody
 } from "../../ui-components";
 import TransactionsTable from "../../components/transactions-table.vue";
 import PaymentDialog from "../../components/payment-dialog.vue";
@@ -44,6 +51,9 @@ export default defineComponent({
         const transactions = ref([]);
         const searchTerm = ref('');
         const paymentDialog = ref<typeof PaymentDialog>();
+        const userStore = useUser();
+        const user = userStore.user;
+        const accountSummary = userStore.accountSummary;
 
         onMounted(async() => {
             transactions.value = await apiClient.getMyTransactions();
@@ -57,7 +67,9 @@ export default defineComponent({
             transactions,
             searchTerm,
             paymentDialog,
-            openPaymentDialog
+            openPaymentDialog,
+            user,
+            accountSummary
         };
     },
 })

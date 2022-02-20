@@ -9,7 +9,8 @@ import {
     notifyUsers,
     previewMessage,
     getMyTransactions,
-    initiateTransaction
+    initiateTransaction,
+    getMyAccountSummary
 } from "../core";
 import { requireAuth, wrapResponse } from "./middleware";
 
@@ -44,6 +45,9 @@ router.get("/me/transactions", requireAuth(), wrapResponse(req =>
 
 router.post("/me/pay", requireAuth(), wrapResponse(req =>
     req.commands.execute(initiateTransaction, req.body)));
+
+router.get("/me/summary", requireAuth(), wrapResponse(req =>
+    req.commands.execute(getMyAccountSummary, undefined)));
 
 router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.params.id)));
 router.get("/users/:id/transactions", wrapResponse(req => req.appServices.transactions.getAllByUser(req.params.id)));

@@ -20,5 +20,5 @@ import { UiSidebar, UiSidebarLayout } from "../../ui-components";
 
 export default defineComponent({
     components: { UiSidebar, UiSidebarLayout }
-})
+});
 </script>
