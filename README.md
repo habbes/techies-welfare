@@ -30,12 +30,13 @@ in the [webapp](./webapp) directory.
 - [ ] Allow admin to manage settings (report message template, registered teams, etc.)
 - [ ] Automatically send monthly report to all users
 - [ ] Authentication
-- [ ] User roles and permissions
+- [x] User roles and permissions
 - [ ] Data validation
 - [x] Proper error handling
+- [ ] Proper error handling and toast notifications on UI
 - [ ] Clean up and improve UI
-- [ ] A member should be able to view their own statements
+- [x] A member should be able to view their own statements
 - [ ] Ability to track payouts
 - [ ] Ability to view current welfare account balance
-- [ ] Documentation to help people get started contributing to and running the project locally
+- [x] Documentation to help people get started contributing to and running the project locally
 - [ ] Improve API client to use fluent pattern
