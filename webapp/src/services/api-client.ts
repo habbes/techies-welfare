@@ -81,6 +81,10 @@ export class ApiClient {
         return getData(this.httpClient.get(`/users/${id}`));
     }
 
+    getLoggedInUser() {
+        return getData(this.httpClient.get(`/me`));
+    }
+
     getUserTransactions(id: string) {
         return getData(this.httpClient.get(`/users/${id}/transactions`));
     }

@@ -16,7 +16,9 @@
 </template>
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue'
+import { apiClient } from '../../api-client';
 import { authService } from "../../auth";
+import { useUser } from '../../store';
 import { UiSidebar, UiSidebarLayout } from "../../ui-components";
 
 export default defineComponent({
@@ -35,7 +37,9 @@ export default defineComponent({
             }
             else {
                 const token = await authService.getAccessToken();
-                console.log('token', token);
+                const user = await apiClient.getLoggedInUser();
+                useUser().setUser(user);
+                console.log('token', token, 'user', user);
             }
 
             

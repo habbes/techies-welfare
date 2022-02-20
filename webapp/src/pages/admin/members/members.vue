@@ -61,11 +61,7 @@ export default defineComponent({
         UiLink
     },
     setup() {
-        const initialUsers = [
-            { name: 'Clement', email: 'clhabins@microsoft.com', phone: '254711222333', team: 'FAST', status: 'status', createdAt: new Date() },
-            { name: 'Clement', email: 'clhabins@microsoft.com', phone: '254711222333', team: 'FAST', status: 'status', createdAt: new Date() }
-        ]
-        const users = ref([...initialUsers]);
+        const users = ref([]);
         const searchTerm = ref('');
 
         onMounted(async() => {

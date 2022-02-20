@@ -7,7 +7,8 @@ import {
     createInvalidTokenError,
     createInvalidLoginError,
     isMongoDuplicateKeyError,
-    createUniquenessFailedError
+    createUniquenessFailedError,
+    createPermissionError
 } from "../../error";
 import { generateId, generateToken, hashPassword, verifyPassword } from "../../../util";
 import { getDefaultScopesForRole, Role } from "../../auth";
@@ -68,6 +69,11 @@ export class UserService implements IUserService {
     async create(args: CreateUserArgs, createdBy: CreatedBy): Promise<IUser> {
         const now = new Date();
         const hasPassword = !!args.password;
+
+        if (hasPassword && createdBy.type === "user") {
+            throw createPermissionError("Cannot set password for another user");
+        }
+
         const password = hasPassword ? await hashPassword(args.password) : "";
         const input: IStoredUser = {
             ...args,

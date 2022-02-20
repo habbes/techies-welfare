@@ -6,7 +6,10 @@ const user = ref<IUser>();
 export function useUser() {
     return {
         user,
-        exists: !!user.value
+        exists: !!user.value,
+        setUser(value: IUser) {
+            user.value = value;
+        }
     };
 }
 
