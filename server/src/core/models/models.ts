@@ -7,15 +7,34 @@ export interface HasTimestamps {
     updatedAt: Date;
 }
 
+export interface HasCreatedBy {
+    createdBy: CreatedBy;
+};
+
+export type CreatedByType = "user" | "system";
+export type CreatedBy = { type: CreatedByType, _id?: string };
+
 export type Role = 'admin' | 'treasurer' | 'member';
 
-export interface IUser extends HasId, HasTimestamps {
+export interface IUser extends HasId, HasTimestamps, HasCreatedBy {
     name: string;
     team: string;
     phone: string;
     email: string;
-    joinedAt: Date;
+    idNumber: string;
+    status: UserStatus;
+    nextOfKin?: IUserNextOfKin,
+    memberSince: Date;
     roles: Role[];
+}
+
+export type UserStatus = 'active' | 'disabled';
+
+export interface IUserNextOfKin {
+    name: string;
+    phone: string;
+    email: string;
+    relationship: string;
 }
 
 export interface IAuthToken extends HasId, HasTimestamps {

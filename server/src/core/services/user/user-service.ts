@@ -8,7 +8,7 @@ import {
     createInvalidLoginError
 } from "../../error";
 import { generateId, generateToken, hashPassword, verifyPassword } from "../../../util";
-import { IAuthToken, ITransaction, IUser, IUserAccountSummary, Role } from "../../models";
+import { CreatedBy, IAuthToken, ITransaction, IUser, IUserAccountSummary, Role } from "../../models";
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
 import { IAppSettingsService } from "../settings/types";
 import { CreateUserArgs, IUserService } from "./types";
@@ -29,14 +29,19 @@ const SAFE_USER_PROJECTION: SafeUserProjection = {
     name: 1,
     phone: 1,
     team: 1,
+    idNumber: 1,
+    nextOfKin: 1,
     roles: 1,
     createdAt: 1,
     updatedAt: 1,
-    joinedAt: 1
+    memberSince: 1,
+    status: 1,
+    createdBy: 1
 };
 
 interface IStoredUser extends IUser {
     password: string;
+    hasPassword: boolean;
 }
 
 export interface UserServiceArgs {
@@ -57,17 +62,20 @@ export class UserService implements IUserService {
         this.settings = args.settings;
     }
 
-    async create(args: CreateUserArgs): Promise<IUser> {
+    async create(args: CreateUserArgs, createdBy: CreatedBy): Promise<IUser> {
         const now = new Date();
-        const password = await hashPassword(args.password);
-        const input = {
+        const hasPassword = !!args.password;
+        const password = hasPassword ? await hashPassword(args.password) : "";
+        const input: IStoredUser = {
             ...args,
             _id: generateId(),
             createdAt: now,
             updatedAt: now,
-            joinedAt: args.joinedAt || now,
+            memberSince: args.memberSince || now,
             roles: ['member'] as Role[],
-            password
+            hasPassword,
+            password,
+            createdBy
         };
 
         try {
@@ -234,7 +242,7 @@ export class UserService implements IUserService {
 function computeArrears(user: IUser, totalContribution: number, monthlyContribution: number) {
     // arrears computation
     const now = new Date();
-    const joinedAt = new Date(user.joinedAt);
+    const joinedAt = new Date(user.memberSince);
     const yearDiff = now.getFullYear() - joinedAt.getFullYear();
     const monthDiff = (yearDiff * 12) + (now.getMonth() - joinedAt.getMonth());
     const expectedContribution = monthDiff * monthlyContribution;

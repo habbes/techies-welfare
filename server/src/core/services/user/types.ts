@@ -1,8 +1,8 @@
-import { ITransaction, IUser, IAuthToken, IUserAccountSummary } from '../../models';
+import { ITransaction, IUser, IAuthToken, IUserAccountSummary, IUserNextOfKin, UserStatus, CreatedBy } from '../../models';
 import { InitiatePaymentArgs } from '../payment';
 
 export interface IUserService {
-    create(args: CreateUserArgs): Promise<IUser>;
+    create(args: CreateUserArgs, createdBy: CreatedBy): Promise<IUser>;
     getById(id: string): Promise<IUser>;
     getByPhone(phone: string): Promise<IUser>;
     getAll(): Promise<IUser[]>;
@@ -20,8 +20,11 @@ export interface CreateUserArgs {
     email: string;
     phone: string;
     team: string;
+    idNumber: string;
+    status: UserStatus;
+    nextOfKin: IUserNextOfKin;
     password: string; // TODO: remove password from args
-    joinedAt?: Date;
+    memberSince: Date;
 }
 
 export interface LoginArgs {
