@@ -15,6 +15,12 @@ export interface IUserService {
     initiatePayment(id: string, args: InitiatePaymentArgs): Promise<ITransaction>;
     getTransactions(id: string): Promise<ITransaction[]>;
     getAccountSummary(id: string): Promise<IUserAccountSummary>;
+    /**
+     * Checks whether there are any users in the database.
+     * This is only used to verify whether initial system
+     * has ran
+     */
+    hasAnyUsers(): Promise<boolean>;
 }
 
 export interface CreateUserArgs {
@@ -25,7 +31,7 @@ export interface CreateUserArgs {
     idNumber: string;
     status: UserStatus;
     nextOfKin: IUserNextOfKin;
-    password: string; // TODO: remove password from args
+    password?: string;
     memberSince: Date;
 }
 

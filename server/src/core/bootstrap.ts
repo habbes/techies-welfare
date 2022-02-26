@@ -11,7 +11,8 @@ import {
     PaymentHandlerRegistry,
     SmsMessageTransport,
     TransactionService,
-    UserService
+    UserService,
+    SystemService
 } from "./services";
 import { AppSettingsService } from "./services/settings/app-settings-service";
 import { IAppServices } from "./types";
@@ -43,6 +44,7 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
 
     const transactions = new TransactionService(db, { paymentHandlers });
     const users = new UserService(db, { transactions, settings, messageTransport });
+    const system = new SystemService({ users });
 
     const linkGenerator = new LinkGeneratorService({ baseUrl: config.webAppBaseUrl });
     const messageContextFactory = new MessageContextFactory({
@@ -60,7 +62,8 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
     return {
         users,
         transactions,
-        bulkMessages
+        bulkMessages,
+        system
     };
 }
 
