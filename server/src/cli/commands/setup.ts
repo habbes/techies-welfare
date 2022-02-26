@@ -5,7 +5,9 @@ import {
     RunSetupArgs,
     ICommandExecutor,
     runSetup,
-    createValidationError
+    createValidationError,
+    hasSetupRun,
+    createAppError
 } from "../../core";
 import { ICliCommand } from "../types";
 
@@ -17,6 +19,10 @@ export const setupCommand: ICliCommand = {
     name: "setup",
     noAuth: true,
     async run(context: IAppContext) {
+        if (await context.executor.execute(hasSetupRun, undefined)) {
+            throw createAppError("Setup has already run on this installation!");
+        }
+
         console.log("Let's register the initial admin for the system");
 
         const adminArgs = await getCreateUserArgs();
@@ -78,8 +84,8 @@ async function getCreateUserArgs() {
 
     const name: string = result.name;
     const email: string = result.email;
-    const phone: string = result.string;
-    const idNumber: string = result.string;
+    const phone: string = result.phone;
+    const idNumber: string = result.idNumber;
     const team: string = result.team;
     const [rawYear, rawMonth, rawDay] = result.memberSince.split("-");
     const memberSince = new Date(Number(rawYear), Number(rawMonth), Number(rawDay));

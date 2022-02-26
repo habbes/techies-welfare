@@ -4,6 +4,9 @@ import { requireScopes } from "./middleware";
 import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs, ManualEntryTransactionData, RequestPassCodeArgs, RunSetupArgs } from "../services";
 import { createUserPrincipal } from "..";
 
+export const hasSetupRun = makeCommand((_, context: ICommandContext) =>
+    context.services.system.hasRunSetup());
+
 export const runSetup = makeCommand((args: RunSetupArgs, context: ICommandContext) =>
     context.services.system.runSetup(args));
 

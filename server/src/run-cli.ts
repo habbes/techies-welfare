@@ -6,7 +6,7 @@ async function runCli() {
         process.exit(0);
     }
     catch(e) {
-        console.error(e);
+        console.error(e.code, e.message);
         process.exit(1);
     }
 }

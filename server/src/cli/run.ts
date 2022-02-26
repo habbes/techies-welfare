@@ -12,7 +12,7 @@ export async function run() {
 
     const command = commands.find(c => c.name === commandName);
     if (!command) {
-        console.error('Unknown command');
+        console.error('Error: Unknown command!\n');
         printHelp();
         return;
     }
@@ -22,7 +22,7 @@ export async function run() {
 }
 
 function printHelp() {
-    console.log('Available commands');
+    console.log('Available commands:');
     commands.forEach((cmd) => {
         console.log(cmd.name);
     });
