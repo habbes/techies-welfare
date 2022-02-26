@@ -21,12 +21,15 @@ export interface HasCreatedBy {
  */
 export type IPrincipalType = "user" | "system";
 
+type UserPrincipal = { type: "user", _id: string };
+type SystemPrincipal = { type: "system", _id: "system" };
+
 /**
  * This represents an actor who executed
  * an operation on the system, e.g. the authenticated
  * user or the system itself for automated operations
  */
-export type IPrincipal = { type: IPrincipalType, _id?: string };
+export type IPrincipal = UserPrincipal | SystemPrincipal;
 
 export interface IUser extends HasId, HasTimestamps, HasCreatedBy {
     name: string;

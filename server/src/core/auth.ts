@@ -1,4 +1,11 @@
+import { IPrincipal } from ".";
 import { createAppError } from "./error";
+
+export function createUserPrincipal(id: string): IPrincipal {
+    return { type: "user", _id: id };
+}
+
+export const getSystemPrincipal = (): IPrincipal => ({ type: "system", _id: "system" });
 
 export type Role = 'admin' | 'member';
 

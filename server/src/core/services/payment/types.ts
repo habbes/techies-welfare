@@ -6,9 +6,10 @@ export interface ITransactionService {
     getUserContributionsTotal(userId: string): Promise<number>;
     getById(id: string): Promise<ITransaction>;
     getAllByUser(userId: string): Promise<ITransaction[]>;
+    getByUserAndId(userId: string, transactionId: string): Promise<ITransaction>;
     getAll(): Promise<ITransaction[]>;
     getById(transactionId: string): Promise<ITransaction>;
-    getByProviderId(provider: string, providerId: string): Promise<ITransaction>;
+    getByProviderId(provider: string, transactionId: string): Promise<ITransaction>;
     handleProviderNotification<TPaymentNotification = Record<string, any>>(providerName: string, notification: TPaymentNotification): Promise<ITransaction>;
     createManualTransaction(args: ManualEntryTransactionData, recordedBy: IPrincipal): Promise<ITransaction>;
 }

@@ -54,7 +54,7 @@ export const authenticate = (): RequestHandler =>
             const user = await req.appServices.users.getByToken(token);
             req.accessToken = token;
             req.authContext = {
-                user,
+                user: user,
                 scopes: user.scopes
             };
 

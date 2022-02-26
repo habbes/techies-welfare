@@ -10,7 +10,14 @@ import {
     previewMessage,
     getMyTransactions,
     initiateTransaction,
-    getMyAccountSummary
+    getMyAccountSummary,
+    getUserById,
+    getUserTransactions,
+    createManualTransaction,
+    getTransactions,
+    getTransactionByProviderAndId,
+    getTransactionById,
+    getMyTransactionById
 } from "../core";
 import { requireAuth, wrapResponse } from "./middleware";
 
@@ -43,21 +50,32 @@ router.get("/me", requireAuth(), wrapResponse(req =>
 router.get("/me/transactions", requireAuth(), wrapResponse(req =>
     req.commands.execute(getMyTransactions, undefined)));
 
+router.get("/me/transactions/:id", requireAuth(), wrapResponse(req =>
+    req.commands.execute(getMyTransactionById, req.params.id)));
+
 router.post("/me/pay", requireAuth(), wrapResponse(req =>
     req.commands.execute(initiateTransaction, req.body)));
 
 router.get("/me/summary", requireAuth(), wrapResponse(req =>
     req.commands.execute(getMyAccountSummary, undefined)));
 
-router.get("/users/:id", wrapResponse(req => req.appServices.users.getById(req.params.id)));
-router.get("/users/:id/transactions", wrapResponse(req => req.appServices.transactions.getAllByUser(req.params.id)));
+router.get("/users/:id", requireAuth(), wrapResponse(req =>
+    req.commands.execute(getUserById, req.params.id)));
 
-router.post("/users/:id/pay", wrapResponse(req => req.appServices.users.initiatePayment(req.params.id, req.body)));
+router.get("/users/:id/transactions", requireAuth(), wrapResponse(req =>
+    req.commands.execute(getUserTransactions, req.params.id)));
 
-router.post("/transactions", wrapResponse(req => req.appServices.transactions.createManualTransaction(req.body)));
-router.get("/transactions", wrapResponse(req => req.appServices.transactions.getAll()));
+router.post("/transactions", wrapResponse(req =>
+    req.commands.execute(createManualTransaction, req.body)));
+
+router.get("/transactions", wrapResponse(req => 
+    req.commands.execute(getTransactions, undefined)));
+
 router.get("/transactions/provider/:provider/:id",
-    wrapResponse(req => req.appServices.transactions.getByProviderId(req.params.provider, req.params.id)));
-router.get("/transactions/:id", wrapResponse(req => req.appServices.transactions.getById(req.params.id)));
+    wrapResponse(req => req.commands.execute(getTransactionByProviderAndId,
+        { provider: req.params.provider, id: req.params.id })));
+
+router.get("/transactions/:id", wrapResponse(req =>
+    req.commands.execute(getTransactionById, req.params.id)));
 
 export { router };
