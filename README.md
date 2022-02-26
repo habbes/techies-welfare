@@ -29,7 +29,7 @@ in the [webapp](./webapp) directory.
 - [x] Allow admin to record transactions manually
 - [ ] Allow admin to manage settings (report message template, registered teams, etc.)
 - [ ] Automatically send monthly report to all users
-- [ ] Authentication
+- [x] Authentication
 - [x] User roles and permissions
 - [ ] Data validation
 - [x] Proper error handling
@@ -39,4 +39,5 @@ in the [webapp](./webapp) directory.
 - [ ] Ability to track payouts
 - [ ] Ability to view current welfare account balance
 - [x] Documentation to help people get started contributing to and running the project locally
+- [ ] Documentation about app architecture and code organization
 - [ ] Improve API client to use fluent pattern
