@@ -5,11 +5,13 @@ import UiRouterButton from "./button/router-button.vue";
 import UiCard from "./card/card.vue";
 import UiDialog from "./dialog/dialog.vue";
 import UiGridLayout from "./layout/grid-layout.vue";
+import UiForm from "./input/form.vue";
 import UiInputGroup from "./input/input-group.vue";
 import UiH2 from "./headings/h2.vue";
 import UiH3 from "./headings/h3.vue";
 import UiLayout from "./layout/layout.vue";
 import UiLink from "./link/link.vue";
+import UiPseudoLink from "./link/pseudo-link.vue";
 import UiSidebar from "./sidebar/sidebar.vue";
 import UiSidebarLayout from "./layout/sidebar-layout.vue";
 import UiTable from "./table/table.vue";
@@ -54,11 +56,13 @@ export {
   UiRouterButton,
   UiCard,
   UiDialog,
+  UiForm,
   UiInputGroup,
   UiTextInput,
   UiTextArea,
   UiH2,
   UiH3,
+  UiPseudoLink,
   UiSidebar,
   UiSidebarLayout,
   UiTable,

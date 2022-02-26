@@ -1,3 +1,4 @@
+import { randomInt } from "crypto";
 import { Db, Collection } from "mongodb";
 import { LoginArgs, LoginResult } from "./types";
 import {
@@ -8,7 +9,8 @@ import {
     createInvalidLoginError,
     isMongoDuplicateKeyError,
     createUniquenessFailedError,
-    createPermissionError
+    createPermissionError,
+    createAppError
 } from "../../error";
 import { generateId, generateToken, hashPassword, verifyPassword } from "../../../util";
 import { getDefaultScopesForRole, Role } from "../../auth";
@@ -16,10 +18,13 @@ import { IPrincipal, IAuthToken, ITransaction, IUser, IUserAccountSummary } from
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
 import { IAppSettingsService } from "../settings";
 import { CreateUserArgs, IUserService, GetByTokenResult } from "./types";
+import { RequestPassCodeArgs } from ".";
+import { IMessageTransport } from "../bulk-messaging";
 
 export const COLLECTION = "users";
 const TOKEN_COLLECTION = "auth_tokens";
 const TOKEN_VALIDITY_MILLIS = 2 * 24 * 3600 * 1000; // 2 days
+const OTP_VALIDITY_MILLIS = 2 * 60 * 1000; // 2 minutes
 
 type SafeUserProjection = Record<keyof IUser, number>;
 
@@ -46,11 +51,16 @@ const SAFE_USER_PROJECTION: SafeUserProjection = {
 interface IStoredUser extends IUser {
     password: string;
     hasPassword: boolean;
+    otp?: {
+        code: string;
+        expiresAt: Date;
+    }
 }
 
 export interface UserServiceArgs {
     transactions: ITransactionService;
     settings: IAppSettingsService;
+    messageTransport: IMessageTransport;
 }
 
 export class UserService implements IUserService {
@@ -58,12 +68,14 @@ export class UserService implements IUserService {
     private tokenCollection: Collection<IAuthToken>;
     private transactions: ITransactionService;
     private settings: IAppSettingsService;
+    private messageTransport: IMessageTransport;
 
     constructor(db: Db, args: UserServiceArgs) {
         this.collection = db.collection(COLLECTION);
         this.tokenCollection = db.collection(TOKEN_COLLECTION);
         this.transactions = args.transactions;
         this.settings = args.settings;
+        this.messageTransport = args.messageTransport;
     }
 
     async create(args: CreateUserArgs, createdBy: IPrincipal): Promise<IUser> {
@@ -146,16 +158,63 @@ export class UserService implements IUserService {
         }
     }
 
+    async requestTemporaryPassCode(args: RequestPassCodeArgs): Promise<void> {
+        try {
+            const user = await this.collection.findOne({ $or: [{ phone: args.login }, { email: args.login }] });
+
+            /**
+             * we don't report whether or not the user exists
+             * for security reasons.
+             * The user will be prompted to check their phone or email
+             * to verify if a code was received
+             */
+            if (!user) return;
+
+            const passCode = generateShortPassCode();
+            const hashedCode = await hashPassword(passCode);
+            const now = new Date();
+            const expiresAt = new Date(now.getTime() + OTP_VALIDITY_MILLIS);
+            const otp = {
+                code: hashedCode,
+                expiresAt
+            };
+
+            const updateResult = await this.collection.findOneAndUpdate(
+                { _id: user._id }, { $set: { otp }});
+            
+            if (!updateResult.ok) {
+                throw createAppError('Failed to update user');
+            }
+
+            const safeUser = getSafeUser(user);
+
+            await this.messageTransport.sendMessage(safeUser, `Toleo Pass Code: ${passCode}`);
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
+        }
+    }
+
     async login(args: LoginArgs): Promise<LoginResult> {
         try {
             const user = await this.collection.findOne(
                 { $or: [{ phone: args.login }, { email: args.login }] });
-            
+
             if (!user) throw createInvalidLoginError();
 
-            // TODO: if password not provided, verify TAN code
-            const passwordCorrect = await verifyPassword(user.password, args.password);
-            if (!passwordCorrect) throw createInvalidLoginError();
+            let verified: boolean;
+            if (args.password) {
+                verified = await this.verifyPassword(args, user);
+            }
+            else if (args.otp) {
+                verified = await this.verifyOtp(args, user);
+            }
+            else {
+                throw createInvalidLoginError();
+            }
+
+            if (!verified) throw createInvalidLoginError();
 
             const token = await this.createAuthToken(user);
 
@@ -170,9 +229,26 @@ export class UserService implements IUserService {
         }
     }
 
+    private verifyPassword(args: LoginArgs, user: IStoredUser): Promise<boolean> {
+        return verifyPassword(user.password, args.password);
+    }
+
+    private async verifyOtp (args: LoginArgs, user: IStoredUser): Promise<boolean> {
+        if (!user.otp) {
+            return false;
+        }
+
+        const now = new Date();
+        if (now.getTime() >= user.otp.expiresAt.getTime()) {
+            return false;
+        }
+
+        return verifyPassword(user.otp.code, args.otp);
+    }
+
     async getByToken(tokenId: string): Promise<GetByTokenResult> {
         try {
-            const token = await this.tokenCollection.findOne({ _id: tokenId, expiresAt:  { $gt: new Date() }});
+            const token = await this.tokenCollection.findOne({ _id: tokenId, expiresAt: { $gt: new Date() } });
             if (!token) throw createInvalidTokenError();
 
             const user = await this.collection.findOne({ _id: token.user }, { projection: SAFE_USER_PROJECTION });
@@ -211,8 +287,8 @@ export class UserService implements IUserService {
             return trx;
         }
         catch (e) {
-           rethrowIfAppError(e);
-           throw createDbError(e.message);
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
         }
     }
 
@@ -226,7 +302,7 @@ export class UserService implements IUserService {
         const settings = await this.settings.getAppSettings();
 
         const arrears = computeArrears(user, totalContribution, settings.monthlyContributionAmount);
-        
+
         return {
             totalContribution,
             arrears
@@ -261,7 +337,6 @@ function computeArrears(user: IUser, totalContribution: number, monthlyContribut
     // arrears computation
     const now = new Date();
     const joinedAt = new Date(user.memberSince);
-    console.log('Arrears', joinedAt);
     const yearDiff = now.getFullYear() - joinedAt.getFullYear();
     const monthDiff = (yearDiff * 12) + (now.getMonth() - joinedAt.getMonth());
     const expectedContribution = monthDiff * monthlyContribution;
@@ -275,14 +350,29 @@ function computeArrears(user: IUser, totalContribution: number, monthlyContribut
  * not be shared from the user
  * @param user 
  */
- function getSafeUser(user: IStoredUser): IUser {
+function getSafeUser(user: IStoredUser): IUser {
     const userDict: any = user;
     return Object.keys(SAFE_USER_PROJECTION)
-      .reduce<any>((safeUser, field) => {
-        if (field in user) {
-          safeUser[field] = userDict[field];
-        }
-  
-        return safeUser;
-      }, {});
-  }
+        .reduce<any>((safeUser, field) => {
+            if (field in user) {
+                safeUser[field] = userDict[field];
+            }
+
+            return safeUser;
+        }, {});
+}
+
+/**
+ * Generate a temporary 6-digit pass code
+ * for authentication
+ */
+function generateShortPassCode() {
+    const length = 6;
+    const digits = [];
+    for (let i = 0; i < length; i++) {
+        const digit = randomInt(10);
+        digits.push(digit);
+    }
+
+    return digits.join('');
+}

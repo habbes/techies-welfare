@@ -8,6 +8,7 @@ export interface IUserService {
     getByPhone(phone: string): Promise<IUser>;
     getAll(): Promise<IUser[]>;
     login(args: LoginArgs): Promise<LoginResult>;
+    requestTemporaryPassCode(args: RequestPassCodeArgs): Promise<void>;
     getByToken(tokenId: string): Promise<GetByTokenResult>;
     logout(token: string): Promise<void>
     logoutAll(user: string): Promise<void>
@@ -33,7 +34,21 @@ export interface LoginArgs {
      * email or phone
      */
     login: string;
-    password: string;
+    /**
+     * password
+     */
+    password?: string;
+    /**
+     * one-time-passcode
+     */
+    otp?: string;
+}
+
+export interface RequestPassCodeArgs {
+    /**
+     * email or phone
+     */
+    login: string;
 }
 
 export interface LoginResult {

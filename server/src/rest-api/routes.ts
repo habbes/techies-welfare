@@ -17,7 +17,8 @@ import {
     getTransactions,
     getTransactionByProviderAndId,
     getTransactionById,
-    getMyTransactionById
+    getMyTransactionById,
+    requestTemporaryPassCode
 } from "../core";
 import { requireAuth, wrapResponse } from "./middleware";
 
@@ -25,6 +26,9 @@ const router = Router();
 
 router.post("/auth/login", wrapResponse(req =>
     req.commands.execute(login, req.body)));
+
+router.post("/auth/request-otp", wrapResponse(req =>
+    req.commands.execute(requestTemporaryPassCode, req.body)));
 
 router.post("/auth/logout", requireAuth(), wrapResponse(req =>
     req.commands.execute(logout, req.accessToken)));
