@@ -17,7 +17,8 @@ interface CreateUserArgs {
 
 interface LoginArgs {
     login: string;
-    password: string;
+    password?: string;
+    otp?: string;
 }
 
 interface LoginResult {
@@ -117,6 +118,10 @@ export class ApiClient {
 
     login(args: LoginArgs): Promise<LoginResult> {
         return getData(this.httpClient.post('/auth/login', args));
+    }
+
+    requestOtp(args: { login: string }) {
+        return getData(this.httpClient.post(`/auth/request-otp`, args))
     }
 
     getAllTransactions() {

@@ -24,7 +24,7 @@ import { IMessageTransport } from "../bulk-messaging";
 export const COLLECTION = "users";
 const TOKEN_COLLECTION = "auth_tokens";
 const TOKEN_VALIDITY_MILLIS = 2 * 24 * 3600 * 1000; // 2 days
-const OTP_VALIDITY_MILLIS = 2 * 60 * 100; // 2 minutes
+const OTP_VALIDITY_MILLIS = 2 * 60 * 1000; // 2 minutes
 
 type SafeUserProjection = Record<keyof IUser, number>;
 
@@ -337,7 +337,6 @@ function computeArrears(user: IUser, totalContribution: number, monthlyContribut
     // arrears computation
     const now = new Date();
     const joinedAt = new Date(user.memberSince);
-    console.log('Arrears', joinedAt);
     const yearDiff = now.getFullYear() - joinedAt.getFullYear();
     const monthDiff = (yearDiff * 12) + (now.getMonth() - joinedAt.getMonth());
     const expectedContribution = monthDiff * monthlyContribution;
@@ -375,5 +374,5 @@ function generateShortPassCode() {
         digits.push(digit);
     }
 
-    return digits.join();
+    return digits.join('');
 }

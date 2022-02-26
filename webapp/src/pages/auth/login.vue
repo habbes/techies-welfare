@@ -3,30 +3,42 @@
         <div class="border-t-8 border-secondary">
             <div class="bg-white py-12 px-8 border rounded-b-sm" style="border-color:#e4eaf4" box-shadow="inset 0px 6px 0px #095cA5">
                 <UiH2>User login</UiH2>
-                <form @submit.prevent="submitLogin">
+                <UiForm @submit="submitUsername" v-if="state === 'username'">
                     <UiInputGroup>
                         <UiTextInput
                             v-model="login"
                             label="Email or Phone"
-                            placeholder="john@mailer.com or 722111222"
+                            placeholder="e.g.: john@mailer.com or 254722111222"
                             required 
                         />
                     </UiInputGroup>
                     <UiInputGroup>
-                        <UiTextInput
-                            v-model="password"
-                            label="Password"
-                            password
-                            required
-                        />
-                    </UiInputGroup>
-                    <UiInputGroup>
                         <UiLayout justify="end">
-                            <UiButton submit>Log in</UiButton>
+                            <UiButton submit>Next</UiButton>
                         </UiLayout>
                     </UiInputGroup>
-                    <UiText primary sm>Forgot your password?</UiText>
-                </form>
+                </UiForm>
+                <UiForm @submit="submitLogin" v-else-if="state === 'enterOtp'">
+                    <UiLayout vertical smallGap>
+                        <UiLayout vertical tinyGap>
+                            <UiText sm>Enter the code you received on your phone or email.</UiText>
+                            <UiText sm>The code is valid for 2 minutes.</UiText>
+                        </UiLayout>
+                        <UiTextInput
+                            v-model="otp"
+                            label="Pass Code"
+                            placeholder="Example: 123456"
+                            required 
+                        />
+                        <UiLayout justify="between" align="center">
+                            <UiPseudoLink @click="goToUsernameState" sm>Back</UiPseudoLink>
+                            <UiLayout justify="end" smallGap>
+                                <UiButton submit>Login</UiButton>
+                                <UiButton @click="resendCode" secondary>Resend code</UiButton>
+                            </UiLayout>
+                        </UiLayout>
+                    </UiLayout>
+                </UiForm>
             </div>
         </div>
   </UiLayout>
@@ -46,7 +58,11 @@ import {
     UiTextInput,
     UiButton,
     UiLayout,
+    UiForm,
+    UiPseudoLink
 } from '../../ui-components';
+
+type PageState = 'username' | 'enterOtp';
 
 export default defineComponent({
     components: {
@@ -55,16 +71,40 @@ export default defineComponent({
         UiInputGroup,
         UiTextInput,
         UiButton,
-        UiLayout
+        UiLayout,
+        UiForm,
+        UiPseudoLink
     },
     setup() {
         const login = ref("");
         const password = ref("");
+        const otp = ref("");
         const router = useRouter();
+        const state = ref<PageState>('username');
+
+        function reset() {
+            login.value = "";
+            password.value = "";
+            otp.value = "";
+            state.value = 'username';
+        }
+
+        function goToUsernameState() {
+            state.value = 'username';
+        }
+
+        async function submitUsername() {
+            await apiClient.requestOtp({ login: login.value });
+            state.value = 'enterOtp';
+        }
+
+        async function resendCode() {
+            await apiClient.requestOtp({ login: login.value });
+        }
 
         async function submitLogin() {
             try {
-                const result = await apiClient.login({ login: login.value, password: password.value });
+                const result = await apiClient.login({ login: login.value, otp: otp.value });
 
                 // this manual login page is only used by the LocalAuthService
                 // so it's safe to assume authService is a LocalAuthService instance
@@ -81,6 +121,8 @@ export default defineComponent({
                 else {
                     router.push({ name: "contributions" });
                 }
+
+                reset();
             }
             catch (e) {
                 // TODO: proper error handling
@@ -91,7 +133,12 @@ export default defineComponent({
         return {
             login,
             password,
-            submitLogin
+            otp,
+            submitUsername,
+            submitLogin,
+            resendCode,
+            state,
+            goToUsernameState
         }
     },
 })
