@@ -1,4 +1,4 @@
-import { rethrowIfAppError, createDbError } from "../../error";
+import { rethrowIfAppError, createDbError, createAppError } from "../../error";
 import { getSystemPrincipal } from "../../auth";
 import { IUserService } from "../user";
 import { ISystemService, RunSetupArgs, RunSetupResult } from "./types";
@@ -20,6 +20,11 @@ export class SystemService implements ISystemService {
 
     async runSetup(args: RunSetupArgs): Promise<RunSetupResult> {
         try {
+            const alreadySetUp = await this.hasRunSetup();
+            if (alreadySetUp) {
+                throw createAppError("Setup has already run on this installation.");
+            }
+
             // create admin user
             const admin = await this.users.create(args.admin, getSystemPrincipal());
 

@@ -29,8 +29,7 @@ export interface CreateUserArgs {
     phone: string;
     team: string;
     idNumber: string;
-    status: UserStatus;
-    nextOfKin: IUserNextOfKin;
+    nextOfKin?: IUserNextOfKin;
     password?: string;
     memberSince: Date;
 }

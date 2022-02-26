@@ -1,8 +1,11 @@
 import { makeCommand } from "../infra";
 import { ICommandContext } from "./types";
 import { requireScopes } from "./middleware";
-import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs, ManualEntryTransactionData, RequestPassCodeArgs } from "../services";
+import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs, ManualEntryTransactionData, RequestPassCodeArgs, RunSetupArgs } from "../services";
 import { createUserPrincipal } from "..";
+
+export const runSetup = makeCommand((args: RunSetupArgs, context: ICommandContext) =>
+    context.services.system.runSetup(args));
 
 export const previewMessage = makeCommand<string, string, ICommandContext>((message, context) => {
     return context.services.bulkMessages.previewMessage(message);
