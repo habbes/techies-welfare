@@ -9,6 +9,7 @@ import {
     ManualEntryPaymentProvider,
     MessageContextFactory,
     PaymentHandlerRegistry,
+    SmsMessageTransport,
     TransactionService,
     UserService
 } from "./services";
@@ -34,8 +35,14 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
 
     const settings = new AppSettingsService();
 
+    const smsService = config.smsProvider === "at" ?
+    new AtSmsService({ apiKey: config.atApiKey, username: config.atUsername ,sender: config.atSmsSender }) :
+    new LocalSmsService();
+
+    const messageTransport = new SmsMessageTransport({ smsService });
+
     const transactions = new TransactionService(db, { paymentHandlers });
-    const users = new UserService(db, { transactions, settings });
+    const users = new UserService(db, { transactions, settings, messageTransport });
 
     const linkGenerator = new LinkGeneratorService({ baseUrl: config.webAppBaseUrl });
     const messageContextFactory = new MessageContextFactory({
@@ -44,14 +51,10 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
         users
     });
 
-    const smsService = config.smsProvider === "at" ?
-        new AtSmsService({ apiKey: config.atApiKey, username: config.atUsername ,sender: config.atSmsSender }) :
-        new LocalSmsService();
-
     const bulkMessages = new BulkMessageService({
         users,
         contextFactory: messageContextFactory,
-        smsService
+        transport: messageTransport
     });
 
     return {
