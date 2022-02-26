@@ -46,11 +46,11 @@ npm run start
 
 This will run the server locally on port `4000`
 
-### Run the CLI setup
+### Run the CLI setup to register initial admin
 
 The project contains a CLI app that you can use to run some administrative commands.
 
-The app does not have a sign-up feature. Members can only be added by admins. The register the initial
+The app does not have a sign-up feature. Members can only be added by admins. To register the initial
 admin, run the following command:
 
 ```
