@@ -63,6 +63,10 @@ The command will fail if the project already has registered users.
 
 Currently, the server is not set-up to auto-rebuild when code changes occur. So when you want to test your changes, you'll need to manually terminate the server and rebuild and re-run it: `npm run build && npm run start`
 
+### Mock SMS-based authentication
+
+If you have not configured Africa's Talking as the SMS gateway (see [Configuration](#configuration)), a mock SMS gateway will be used which simply logs SMS messages on the console. When logging in, check the terminal where the server is running to see the generated OTP pass code.
+
 ### Configuration
 
 The server uses a bunch of config variables which are retrieved from environment variables. These includes things like server port, MongoDB address, API Keys, web app base URL, etc.
