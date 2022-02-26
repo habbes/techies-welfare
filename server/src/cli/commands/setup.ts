@@ -1,24 +1,18 @@
 import { prompt } from "inquirer";
 import {
-    ICommandContext,
     CreateUserArgs,
     RunSetupArgs,
-    ICommandExecutor,
     runSetup,
     createValidationError,
     hasSetupRun,
     createAppError
 } from "../../core";
-import { ICliCommand } from "../types";
-
-interface IAppContext {
-    executor: ICommandExecutor<ICommandContext>;
-}
+import { ICliCommand, ICliContext } from "../types";
 
 export const setupCommand: ICliCommand = {
     name: "setup",
     noAuth: true,
-    async run(context: IAppContext) {
+    async run(context: ICliContext) {
         if (await context.executor.execute(hasSetupRun, undefined)) {
             throw createAppError("Setup has already run on this installation!");
         }
