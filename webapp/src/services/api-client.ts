@@ -71,6 +71,17 @@ export class ApiClient {
 
             return config;
         })
+
+        this.httpClient.interceptors.response.use(r => r, (error) => {
+            if (authService.isAuthenticated()) {
+                // logout the user if the token is invalid
+                if (error.response.status === 401) {
+                    authService.logout();
+                }
+            }
+
+            return error;
+        });
     }
 
     getAllUsers() {

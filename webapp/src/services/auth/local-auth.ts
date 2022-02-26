@@ -26,6 +26,7 @@ export class LocalAuthService implements IAuthService {
 
     logout(): Promise<void> {
         localStorage.removeItem(TOKEN_KEY);
+        this.redirectLoginPage();
         return Promise.resolve();
     }
     login(): Promise<void> {
