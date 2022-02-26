@@ -80,7 +80,7 @@ export class ApiClient {
                 }
             }
 
-            return error;
+            throw error;
         });
     }
 

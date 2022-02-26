@@ -20,7 +20,7 @@ export const routes: RouteRecordRaw[] = [
         name: "dashboard",
         children: [
             {
-                path: "/",
+                path: "",
                 component: DashboardHome,
                 name: "dashboard-home",
                 children: [

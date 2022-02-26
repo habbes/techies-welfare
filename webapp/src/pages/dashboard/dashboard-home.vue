@@ -19,6 +19,6 @@ import { defineComponent } from 'vue'
 import { UiSidebar, UiSidebarLayout } from "../../ui-components";
 
 export default defineComponent({
-    components: { UiSidebar, UiSidebarLayout }
+    components: { UiSidebar, UiSidebarLayout },
 });
 </script>

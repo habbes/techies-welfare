@@ -4,10 +4,16 @@
             <UiLayout>
                 <UiH2>My contributions</UiH2>
             </UiLayout>
-            <UiLayout align="center" gap="3">
-                <UiLayout gap="3" v-if="accountSummary">
-                    <div><UiText class="font-semibold">Total contribution:</UiText> Ksh {{ accountSummary.totalContribution }}</div>
-                    <div><UiText class="font-semibold">Arrears:</UiText> Ksh {{ accountSummary.arrears }}</div>
+            <UiLayout align="center" smallGap>
+                <UiLayout smallGap v-if="accountSummary">
+                    <UiLayout tinyGap>
+                        <UiText class="font-semibold">Total contribution:</UiText>
+                        <UiText>Ksh {{ accountSummary.totalContribution }}</UiText>
+                    </UiLayout>
+                    <UiLayout tinyGap>
+                        <UiText class="font-semibold">Arrears:</UiText>
+                        <UiText>Ksh {{ accountSummary.arrears }}</UiText>
+                    </UiLayout>
                 </UiLayout>
                 <UiButton primary @click="openPaymentDialog">Make contribution</UiButton>
             </UiLayout>

@@ -65,6 +65,9 @@ export default defineComponent({
         async function submitLogin() {
             try {
                 const result = await apiClient.login({ login: login.value, password: password.value });
+
+                // this manual login page is only used by the LocalAuthService
+                // so it's safe to assume authService is a LocalAuthService instance
                 (authService as LocalAuthService).setAccessToken(result.token._id);
 
                 login.value = "";
@@ -76,7 +79,7 @@ export default defineComponent({
                     router.push(router.currentRoute.value.query.redirect as string)
                 }
                 else {
-                    router.push({ name: "dashboard-home" });
+                    router.push({ name: "contributions" });
                 }
             }
             catch (e) {

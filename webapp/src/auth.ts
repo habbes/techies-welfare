@@ -18,6 +18,11 @@ const scopes = [
 */
 
 export const authService: IAuthService = new LocalAuthService(() => {
-    useRouter().push("/auth/login");
+    const router = useRouter();
+    // TODO: this is a hack, useRouter() might return undefined
+    // at this point since it's not use inside setup()
+    // find a more robust way to handle this, maybe pass the router
+    // variable directly to the service
+    router?.push("/auth/login");
 });
 
