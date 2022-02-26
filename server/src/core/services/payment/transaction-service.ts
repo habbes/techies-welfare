@@ -115,16 +115,7 @@ export class TransactionService implements ITransactionService {
         try {
             const results = await this.collection.aggregate<{ total : number }>([
                 {
-                    $match: {
-                        $or: [
-                            // be conservative when dealing with pending transactions:
-                            // if transaction is from the user, deduct it from balance unless it's failed
-                            { from: userId, status: 'success' }
-                        ]
-                    }
-                },
-                {
-                    $project: { from: 1, to: 1, amount: 1, expectedAmount: 1, status: 1 }
+                    $match: { fromUser: userId, status: 'success' }
                 },
                 {
                     $group: {
@@ -133,7 +124,7 @@ export class TransactionService implements ITransactionService {
                     }
                 }
             ]).toArray();
-
+            
             if (!results.length) return 0;
 
             return results[0].total;
