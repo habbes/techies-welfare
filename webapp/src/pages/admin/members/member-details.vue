@@ -49,11 +49,13 @@
             v-show="isAddPaymentPaneOpen"
             @cancel="closeAddPaymentPane"
             @addPayment="onAddPayment"/>
-        <div class="mt-5" v-show="!isAddPaymentPaneOpen">
-            <ui-h3>Transactions</ui-h3>
-            <ui-button class="mb-5" @click="openAddPaymentPane">Add payment</ui-button>
+        <UiLayout vertical class="mt-5" v-show="!isAddPaymentPaneOpen">
+            <UiLayout justify="between" align="center">
+                <UiH3>Payments</UiH3>
+                <UiButton class="mb-5" @click="openAddPaymentPane">Add payment</UiButton>
+            </UiLayout>
             <TransactionsTable :transactions="transactions" />
-        </div>
+        </UiLayout>
     </div>
 </template>
 <script lang="ts">
@@ -62,11 +64,12 @@ import { useRoute } from 'vue-router';
 import { apiClient } from "../../../api-client";
 import AddPayment from "./add-payment.vue";
 import TransactionsTable from "../../../components/transactions-table.vue";
+import { UiLayout, UiH2, UiH3, UiButton } from "../../../ui-components";
 
 const MONTHLY_CONTRIBUTION = 1000;
 
 export default defineComponent({
-    components: { AddPayment, TransactionsTable },
+    components: { AddPayment, TransactionsTable, UiH2, UiH3, UiLayout, UiButton },
     setup() {
         const user = ref();
         const transactions = ref([]);
