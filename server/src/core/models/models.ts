@@ -10,11 +10,26 @@ export interface HasTimestamps {
 }
 
 export interface HasCreatedBy {
-    createdBy: CreatedBy;
+    createdBy: IPrincipal;
 };
 
-export type CreatedByType = "user" | "system";
-export type CreatedBy = { type: CreatedByType, _id?: string };
+/**
+ * The type of principal or agent
+ * who can interact with the system
+ * e.g. the authenticated
+ * user or the system itself for automated operations
+ */
+export type IPrincipalType = "user" | "system";
+
+type UserPrincipal = { type: "user", _id: string };
+type SystemPrincipal = { type: "system", _id: "system" };
+
+/**
+ * This represents an actor who executed
+ * an operation on the system, e.g. the authenticated
+ * user or the system itself for automated operations
+ */
+export type IPrincipal = UserPrincipal | SystemPrincipal;
 
 export interface IUser extends HasId, HasTimestamps, HasCreatedBy {
     name: string;

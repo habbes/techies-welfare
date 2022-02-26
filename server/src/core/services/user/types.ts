@@ -1,9 +1,9 @@
 import { Permission } from '../../auth';
-import { ITransaction, IUser, IAuthToken, IUserAccountSummary, IUserNextOfKin, UserStatus, CreatedBy } from '../../models';
+import { ITransaction, IUser, IAuthToken, IUserAccountSummary, IUserNextOfKin, UserStatus, IPrincipal } from '../../models';
 import { InitiatePaymentArgs } from '../payment';
 
 export interface IUserService {
-    create(args: CreateUserArgs, createdBy: CreatedBy): Promise<IUser>;
+    create(args: CreateUserArgs, createdBy: IPrincipal): Promise<IUser>;
     getById(id: string): Promise<IUser>;
     getByPhone(phone: string): Promise<IUser>;
     getAll(): Promise<IUser[]>;

@@ -8,12 +8,38 @@ import { defineComponent, computed } from 'vue'
 
 export default defineComponent({
     props: {
+        /**
+         * Use primary text color
+         */
         primary: Boolean,
+        /**
+         * Use secondary text color
+         */
         secondary: Boolean,
+        /**
+         * Use danger text color
+         */
         danger: Boolean,
+        /**
+         * Make the text small
+         */
         sm: Boolean,
+        /**
+         * Make the text large
+         */
         lg: Boolean,
-        xl: Boolean
+        /**
+         * Make the text extra-large
+         */
+        xl: Boolean,
+        /**
+         * Use a monospace font style
+         */
+        monospace: Boolean,
+        /**
+         * Make the text bold
+         */
+        bold: Boolean,
     },
     setup(props) {
         const classes = computed(() => {
@@ -25,7 +51,9 @@ export default defineComponent({
                 'text-danger': props.danger,
                 'text-sm': props.sm,
                 'text-lg': props.lg,
-                'text-xl': props.xl
+                'text-xl': props.xl,
+                'font-mono': props.monospace,
+                'font-semibold': props.bold,
             };
         });
 

@@ -11,11 +11,42 @@ type Align = 'center' | 'start' | 'end' | 'stretch' | 'baseline';
 
 export default defineComponent({
     props: {
+        /**
+         * Makes the layout vertical
+         * with children laid out top to bottom
+         */
         vertical: Boolean,
+        /**
+         * Fills the width of the parent
+         */
         fill: Boolean,
+        /**
+         * Specifies how children will be arranged
+         * along the main axis, possible options are:
+         * `center`, `start`, `end`, `between`, `evenly` and `around`
+         */
         justify: String as PropType<Justify>,
+        /**
+         * Specifies how children will be aligned
+         * across the axis, possible options are:
+         * `center`, `start`, `end`, `stretch`, `baseline`
+         */
         align: String as PropType<Align>,
-        gap: Number
+        /**
+         * Sets the size of the gap space between elements.
+         * Prefer using the following props instead to maintain consistency:
+         *  `smallGap`,`tinyGap`
+         */
+        gap: Number,
+        /**
+         * Sets a small gap space between elements.
+         * This is the most commonly use gap
+         */
+        smallGap: Boolean,
+        /**
+         * Sets a minimal gap space between elements
+         */
+        tinyGap: Boolean
     },
     setup(props) {
 
@@ -33,6 +64,8 @@ export default defineComponent({
             "items-end": props.align === 'end',
             "items-stretch": props.align === 'stretch',
             "items-baseline": props.align === 'baseline',
+            "gap-3": props.smallGap,
+            "gap-1": props.tinyGap,
             [`gap-${props.gap}`]: props.gap !== undefined,
         }));
 

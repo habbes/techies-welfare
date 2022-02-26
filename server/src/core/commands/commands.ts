@@ -1,7 +1,8 @@
 import { makeCommand } from "../infra";
 import { ICommandContext } from "./types";
 import { requireScopes } from "./middleware";
-import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs } from "../services";
+import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs, ManualEntryTransactionData } from "../services";
+import { createUserPrincipal } from "..";
 
 export const previewMessage = makeCommand<string, string, ICommandContext>((message, context) => {
     return context.services.bulkMessages.previewMessage(message);
@@ -18,6 +19,10 @@ export const createUser = makeCommand((args: CreateUserArgs, context: ICommandCo
 
 export const getUsers = makeCommand((_, context: ICommandContext) => {
     return context.services.users.getAll();
+}, [requireScopes('Users.Read.All')]);
+
+export const getUserById = makeCommand((id: string, context: ICommandContext) => {
+    return context.services.users.getById(id);
 }, [requireScopes('Users.Read.All')]);
 
 export const login = makeCommand((args: LoginArgs, context: ICommandContext) => {
@@ -40,6 +45,10 @@ export const getMyTransactions = makeCommand((_, context: ICommandContext) =>
     context.services.users.getTransactions(context.authContext.user._id),
     [requireScopes('Transactions.Read.Self')]);
 
+export const getMyTransactionById = makeCommand((transactionId: string, context: ICommandContext) =>
+    context.services.transactions.getByUserAndId(context.authContext.user._id, transactionId),
+    [requireScopes('Transactions.Read.Self')]);
+
 export const initiateTransaction = makeCommand((args: InitiatePaymentArgs, context: ICommandContext) =>
     context.services.users.initiatePayment(context.authContext.user._id, args),
     [requireScopes('Transactions.Initiate.Self')]);
@@ -50,7 +59,7 @@ export const getMyAccountSummary = makeCommand((_, context: ICommandContext) =>
 
 export const getUserTransactions = makeCommand((user: string, context: ICommandContext) =>
     context.services.users.getTransactions(user),
-    [requireScopes('Transactions.Read.All')]);
+    [requireScopes('Transactions.Read.All', 'Users.Read.All')]);
 
 export const getUserAccountSummary = makeCommand((user: string, context: ICommandContext) =>
     context.services.users.getAccountSummary(user),
@@ -58,4 +67,16 @@ export const getUserAccountSummary = makeCommand((user: string, context: IComman
 
 export const getTransactions = makeCommand((_, context: ICommandContext) =>
     context.services.transactions.getAll(),
+    [requireScopes('Transactions.Read.All')]);
+
+export const getTransactionById = makeCommand((id: string, context: ICommandContext) =>
+    context.services.transactions.getById(id),
+    [requireScopes('Transactions.Read.All')]);
+
+export const createManualTransaction = makeCommand((args: ManualEntryTransactionData, context: ICommandContext) =>
+    context.services.transactions.createManualTransaction(args, createUserPrincipal(context.authContext.user._id)),
+    [requireScopes("Transactions.Create")]);
+
+export const getTransactionByProviderAndId = makeCommand((args: { provider: string, id: string }, context: ICommandContext) =>
+    context.services.transactions.getByProviderId(args.provider, args.id),
     [requireScopes('Transactions.Read.All')]);

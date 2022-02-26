@@ -5,8 +5,6 @@
       :type="password ? 'password' : type ? type : 'text'"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
-      class="inline-flex px-3 py-2 border border-tertiary-light rounded-sm shadow-sm h-8
-      focus:border-primary focus:outline-none text-secondary"
       style="font-size:14px"
       :class="classes"
       :placeholder="placeholder"
@@ -15,23 +13,20 @@
 </template>
 <script lang="ts">
 import { defineComponent, computed } from "vue";
+import { getTextFieldCommonClasses, getTextFieldCommonProps } from "./util";
 
 export default defineComponent({
   props: {
-    label: String,
+    ...getTextFieldCommonProps(),
     type: String,
-    placeholder: String,
-    required: Boolean,
-    full: Boolean,
-    modelValue: String,
+    modelValue: String || Number,
     password: Boolean,
   },
   emits: ["update:modelValue"],
   setup(props) {
     const classes = computed(() => {
       return {
-        "w-full": props.full,
-        "w-72": !props.full
+        ...getTextFieldCommonClasses(props)
       }
     });
 

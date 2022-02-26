@@ -40,12 +40,11 @@ interface SendMessageArgs {
     message: string;
 }
 
-export interface ManualEntryTransactionData {
+export interface ManualEntryTransactionArgs {
     id: string;
     fromUser: string;
     amount: number;
     metadata: {
-        recordedBy: string;
         transactionDate: Date;
         details: string;
     }
@@ -71,6 +70,17 @@ export class ApiClient {
 
             return config;
         })
+
+        this.httpClient.interceptors.response.use(r => r, (error) => {
+            if (authService.isAuthenticated()) {
+                // logout the user if the token is invalid
+                if (error.response.status === 401) {
+                    authService.logout();
+                }
+            }
+
+            throw error;
+        });
     }
 
     getAllUsers() {
@@ -121,7 +131,7 @@ export class ApiClient {
         return getData(this.httpClient.post(`/users/${userId}/pay`, { amount, type }));
     }
 
-    addManualPayment(args: ManualEntryTransactionData) {
+    addManualPayment(args: ManualEntryTransactionArgs) {
         return getData(this.httpClient.post(`/transactions`, args));
     }
 

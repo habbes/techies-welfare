@@ -1,5 +1,5 @@
 import { Collection, Db } from "mongodb";
-import { ITransaction, IUser, TransactionStatus } from "../../models";
+import { IPrincipal, ITransaction, IUser, TransactionStatus } from "../../models";
 import { generateId } from "../../../util";
 import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
 import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
@@ -50,7 +50,7 @@ export class TransactionService implements ITransactionService {
         }
     }
 
-    async createManualTransaction(args: ManualEntryTransactionData): Promise<ITransaction> {
+    async createManualTransaction(args: ManualEntryTransactionData, recordedBy: IPrincipal): Promise<ITransaction> {
         const provider = this.handlers.get(MANUAL_ENTRY_PAYMENT_PROVIDER_NAME);
 
         const trxArgs: CreateTransactionArgs = {
@@ -67,6 +67,7 @@ export class TransactionService implements ITransactionService {
             trxArgs.providerTransactionId = providerResult.providerTransactionId;
             trxArgs.status = providerResult.status;
             trxArgs.metadata = providerResult.metadata;
+            trxArgs.metadata.recordedBy = recordedBy;
 
             const result = await this.create(trxArgs);
             return result;
@@ -170,25 +171,23 @@ export class TransactionService implements ITransactionService {
             const trx = await this.collection.findOne({ _id: transactionId });
             if (!trx) throw createResourceNotFoundError('Transaction not found');
 
-            if (isFinalStatus(trx.status)) {
-                return trx;
-            }
+            const updated = await this.updateTransactionStatus(trx);
+            return updated;
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e);
+        }
+    }
 
-            const providerResult = await this.handlers.get(trx.provider).getTransaction(trx);
-            const updatedRes = await this.collection.findOneAndUpdate(
-                { _id: trx._id }, 
-                {
-                $set: {
-                    status: providerResult.status,
-                    failureReason: providerResult.failureReason,
-                    metadata: providerResult.metadata,
-                    updatedAt: new Date(),
-                    amount: providerResult.amount
-                }
-            }, { returnOriginal: false });
-            
-            if (!updatedRes.value) throw createResourceNotFoundError("Transaction not found");
-            return updatedRes.value;
+    async getByUserAndId(userId: string, transactionId: string): Promise<ITransaction<any>> {
+        try {
+            const trx = await this.collection.findOne({ _id: transactionId, fromUser: userId });
+            if (!trx) throw createResourceNotFoundError('Transaction not found');
+
+            const updated = await this.updateTransactionStatus(trx);
+
+            return updated;
         }
         catch (e) {
             rethrowIfAppError(e);
@@ -199,12 +198,38 @@ export class TransactionService implements ITransactionService {
     async getByProviderId(provider: string, transactionId: string): Promise<ITransaction> {
         try {
             const trx = await this.collection.findOne({ provider, providerTransactionId: transactionId });
-            return trx;
+            if (!trx) throw createResourceNotFoundError('Transaction not found');
+
+            const updated = await this.updateTransactionStatus(trx);
+
+            return updated;
         }
         catch (e) {
             rethrowIfAppError(e);
             throw createDbError(e);
         }
+    }
+
+    private async updateTransactionStatus(trx: ITransaction): Promise<ITransaction> {
+        if (isFinalStatus(trx.status)) {
+            return trx;
+        }
+
+        const providerResult = await this.handlers.get(trx.provider).getTransaction(trx);
+        const updatedRes = await this.collection.findOneAndUpdate(
+            { _id: trx._id }, 
+            {
+            $set: {
+                status: providerResult.status,
+                failureReason: providerResult.failureReason,
+                metadata: providerResult.metadata,
+                updatedAt: new Date(),
+                amount: providerResult.amount
+            }
+        }, { returnOriginal: false });
+        
+        if (!updatedRes.value) throw createResourceNotFoundError("Transaction not found");
+        return updatedRes.value;
     }
 
     private async create(args: CreateTransactionArgs): Promise<ITransaction> {

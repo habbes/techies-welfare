@@ -12,7 +12,7 @@ import {
 } from "../../error";
 import { generateId, generateToken, hashPassword, verifyPassword } from "../../../util";
 import { getDefaultScopesForRole, Role } from "../../auth";
-import { CreatedBy, IAuthToken, ITransaction, IUser, IUserAccountSummary } from "../../models";
+import { IPrincipal, IAuthToken, ITransaction, IUser, IUserAccountSummary } from "../../models";
 import { InitiatePaymentArgs, ITransactionService } from "../payment";
 import { IAppSettingsService } from "../settings";
 import { CreateUserArgs, IUserService, GetByTokenResult } from "./types";
@@ -66,7 +66,7 @@ export class UserService implements IUserService {
         this.settings = args.settings;
     }
 
-    async create(args: CreateUserArgs, createdBy: CreatedBy): Promise<IUser> {
+    async create(args: CreateUserArgs, createdBy: IPrincipal): Promise<IUser> {
         const now = new Date();
         const hasPassword = !!args.password;
 

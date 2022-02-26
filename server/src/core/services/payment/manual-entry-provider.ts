@@ -20,7 +20,10 @@ export class ManualEntryPaymentProvider implements IPaymentHandler<ManualEntryTr
             amount: notification.amount,
             failureReason: "",
             providerTransactionId: notification.id,
-            metadata: notification.metadata
+            metadata: {
+                ...notification.metadata,
+                transactionDate: new Date(notification.metadata.transactionDate)
+            }
         });
     }
 

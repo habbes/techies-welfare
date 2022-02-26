@@ -33,15 +33,37 @@
   </nav>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { IUser } from "../services";
-import { UiDropdown, UiDropdownItem, UiChevronDownIcon  } from "../ui-components";
+import { clearSession } from "../store";
+import { authService } from "../auth";
+import {
+  UiDropdown,
+  UiDropdownItem,
+  UiChevronDownIcon,
+} from "../ui-components";
 
 export default defineComponent({
-    components: { UiDropdown, UiDropdownItem, UiChevronDownIcon },
-    props: {
-        user: Object as PropType<IUser>,
-        logout: Function
+  components: { UiDropdown, UiDropdownItem, UiChevronDownIcon },
+  props: {
+    user: Object as PropType<IUser>
+  },
+  setup() {
+    const router = useRouter();
+
+    async function logout() {
+      clearSession();
+      await authService.logout();
+      // TODO: ideally we should not manually redirect to login
+      // since authService.logout() should handle that
+      // but because of a bug, that tends to fail
+      router.push({ name: "login" });
     }
+
+    return {
+      logout
+    }
+  },
 });
 </script>
