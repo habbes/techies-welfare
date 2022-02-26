@@ -49,7 +49,7 @@ const rolePermissions: Record<Role, Permission[]> = {
 export function getDefaultScopesForRole(roles: Role[]) {
     const scopes = roles.reduce((scopesSoFar, role) => {
         const scopesForRole = rolePermissions[role];
-        console.log('scopes for role', role, scopesForRole);
+
         if (!scopesForRole) {
             throw createAppError(`Could not get scopes for unknown role ${role}`);
         }

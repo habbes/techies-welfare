@@ -86,6 +86,13 @@ export class UserService implements IUserService {
             throw createPermissionError("Cannot set password for another user");
         }
 
+        const roles: Role[] = ["member"];
+
+        // only initial admin user is created by the system
+        if (createdBy.type === 'system') {
+            roles.push('admin');
+        }
+
         const password = hasPassword ? await hashPassword(args.password) : "";
         const input: IStoredUser = {
             ...args,
@@ -93,7 +100,8 @@ export class UserService implements IUserService {
             createdAt: now,
             updatedAt: now,
             memberSince: args.memberSince || now,
-            roles: ['member'] as Role[],
+            roles,
+            status: 'active',
             hasPassword,
             password,
             createdBy
@@ -307,6 +315,21 @@ export class UserService implements IUserService {
             totalContribution,
             arrears
         };
+    }
+
+    async hasAnyUsers(): Promise<boolean> {
+        try {
+            const user = await this.collection.findOne({});
+            if (user) {
+                return true;
+            }
+
+            return false;
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
+        }
     }
 
     private async createAuthToken(user: IUser): Promise<IAuthToken> {

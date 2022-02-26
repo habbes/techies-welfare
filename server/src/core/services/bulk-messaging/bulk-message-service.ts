@@ -7,14 +7,13 @@ import { RecipientResolver } from './recipient-resolver';
 import { MessageTemplateResolver } from './template-resolver';
 import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver } from './types';
 import { getPreviewUser } from './preview-user';
-import { createValidationError } from '../..';
+import { createAppError, createValidationError } from '../..';
 import { BulkMessageSendArgs } from '.';
 
 export interface BulkMessageServiceArgs {
   contextFactory: IMessageContextFactory;
   templateResolver?: IMessageTemplateResolver;
-  transport?: IMessageTransport;
-  smsService?: ISmsService;
+  transport: IMessageTransport;
   recipientResolver?: IRecipientResolver;
   users: IUserService
 }
@@ -27,17 +26,13 @@ export class BulkMessageService implements IBulkMessageService {
 
     constructor(args: BulkMessageServiceArgs) {
         if (!args.recipientResolver && !args.users) {
-            throw createValidationError('Bulk message args must provide either recipientsResolver or users');
-        }
-
-        if (!args.transport && !args.smsService) {
-            throw createValidationError('Bulk message args must provide either transport or smsProvider');
+            throw createAppError('Bulk message args must provide either recipientsResolver or users');
         }
 
         this.contextFactory = args.contextFactory;
         this.templateResolver = args.templateResolver || new MessageTemplateResolver();
         this.recipientResolver = args.recipientResolver || new RecipientResolver({ users: args.users });
-        this.transport = args.transport || new SmsMessageTransport({ smsService: args.smsService });
+        this.transport = args.transport;
     }
 
     async send({ recipients, message }: BulkMessageSendArgs): Promise<BulkMessageReport> {
