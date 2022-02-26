@@ -46,6 +46,19 @@ npm run start
 
 This will run the server locally on port `4000`
 
+### Run the CLI setup
+
+The project contains a CLI app that you can use to run some administrative commands.
+
+The app does not have a sign-up feature. Members can only be added by admins. The register the initial
+admin, run the following command:
+
+```
+npm run cli setup
+```
+
+The command will fail if the project already has registered users.
+
 ### Rebuilding during development
 
 Currently, the server is not set-up to auto-rebuild when code changes occur. So when you want to test your changes, you'll need to manually terminate the server and rebuild and re-run it: `npm run build && npm run start`
