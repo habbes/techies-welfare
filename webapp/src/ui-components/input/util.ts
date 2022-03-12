@@ -9,16 +9,19 @@ export function getTextFieldCommonProps() {
         full: Boolean,
         label: String,
         placeholder: String,
-        required: Boolean
+        required: Boolean,
+        disabled: Boolean
     }
 }
 
-export function getTextFieldCommonClasses(props: { full?: boolean }) {
+export function getTextFieldCommonClasses(props: { full?: boolean, disabled?: boolean }) {
     
 
     return {
         ...baseClasses,
         "w-full": props.full,
         "w-72": !props.full,
+        "bg-mute": props.disabled,
+        "border-disabled": props.disabled
     }
 }

@@ -1,14 +1,16 @@
 <template>
-  <div class="">
+    <div class="">
     <label v-if="label" class="block text-sm mb-1 text-body">{{ label }}</label>
-    <input
-      :type="password ? 'password' : type ? type : 'text'"
+    <select
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @change="$emit('update:modelValue', $event.target.value)"
       style="font-size:14px"
       :class="classes"
       :placeholder="placeholder"
       :required="required">
+      <option disabled :value="undefined">{{ defaultText || "Select option" }}</option>
+      <slot></slot>
+    </select>
   </div>
 </template>
 <script lang="ts">
@@ -18,16 +20,8 @@ import { getTextFieldCommonClasses, getTextFieldCommonProps } from "./util";
 export default defineComponent({
   props: {
     ...getTextFieldCommonProps(),
-    /**
-     * Input type, possible options are `text`, `email`, `tel`
-     */
-    type: String,
-    modelValue: String,
-    /**
-     * Whether this should be treated as password
-     * input, i.e. hidden input value
-     */
-    password: Boolean,
+    defaultText: String,
+    modelValue: String
   },
   emits: ["update:modelValue"],
   setup(props) {
