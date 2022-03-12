@@ -11,7 +11,7 @@ async function startServer() {
 
         mountRestApi(server, "/api", app);
 
-        mountFlutterwaveWebhooks(server, config.flutterwaveWebhooksRoot);
+        mountFlutterwaveWebhooks(server, config.flutterwaveWebhooksRoot, app);
 
         server.listen(config.port, () => {
             console.log(`Server listening on port ${config.port}`);
