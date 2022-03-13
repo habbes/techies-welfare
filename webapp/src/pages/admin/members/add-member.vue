@@ -38,19 +38,21 @@
                         label="Team"
                         full
                         class="mb-3"/>
-                    <UiTextInput
+                    <UiDateInput
                         v-model="memberSince"
                         label="Member Since*"
-                        type="date"
                         full
                         required
                         class="mb-3" />
-                    <UiTextInput
+                    <UiSelect
                         v-model="status"
                         label="Status*"
                         full
                         required
-                        class="mb-3"/>
+                        class="mb-3">
+                        <UiSelectOption label="Active" value="active" />
+                        <UiSelectOption label="Disabled" value="disabled" />
+                    </UiSelect>
                 </UiGridLayout>
 
                 <UiH3>Next of kin details</UiH3>
@@ -108,7 +110,19 @@
 import { defineComponent, ref, reactive } from 'vue';
 import { useRouter } from "vue-router";
 import { apiClient } from "../../../api-client";
-import { UiButton, UiGridLayout, UiLayout, UiDialog, UiTextInput, UiH2, UiH3, UiCard } from "../../../ui-components";
+import {
+    UiButton,
+    UiGridLayout,
+    UiLayout,
+    UiDialog,
+    UiTextInput,
+    UiH2,
+    UiH3,
+    UiCard,
+    UiSelect,
+    UiSelectOption,
+    UiDateInput
+    } from "../../../ui-components";
 
 
 export default defineComponent({
@@ -120,7 +134,10 @@ export default defineComponent({
         UiTextInput,
         UiH2,
         UiH3,
-        UiCard
+        UiCard,
+        UiSelect,
+        UiSelectOption,
+        UiDateInput
     },
     setup() {
         const name = ref('');
@@ -129,7 +146,7 @@ export default defineComponent({
         const idNumber = ref('');
         const team = ref('');
         const status = ref('active');
-        const memberSince = ref(getDefaultDateString());
+        const memberSince = ref(new Date());
         const nextOfKin = reactive({
             name: '',
             phone: '',
@@ -160,11 +177,7 @@ export default defineComponent({
             nextOfKin.phone = '';
             nextOfKin.email = '';
             nextOfKin.relationship = '';
-            memberSince.value = getDefaultDateString();
-        }
-
-        function getDefaultDateString() {
-            return new Date().toISOString().split("T")[0];
+            memberSince.value = new Date();
         }
 
         function cancel() {

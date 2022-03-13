@@ -1,7 +1,7 @@
 <template>
     <UiCard>
         <UiH3>Register payment made offline</UiH3>
-        <form class="w-1/2" @submit.prevent="submitForm">
+        <UiForm class="w-1/2" @submit="submitForm">
             <UiLayout smallGap vertical>
                 <UiNumberInput
                     v-model="amount"
@@ -33,7 +33,7 @@
                     <UiButton @click="cancel" secondary>Cancel</UiButton>
                 </UiLayout>
             </UiLayout>
-        </form>
+        </UiForm>
         <UiDialog ref="confirmDialog" title="Confirm payment details">
             <UiLayout vertical smallGap>
                 <UiLayout vertical tinyGap>
@@ -69,7 +69,8 @@ import {
     UiText,
     UiNumberInput,
     UiDateInput,
-    UiTimeInput
+    UiTimeInput,
+    UiForm
 } from "../../../ui-components";
 
 export default defineComponent({
@@ -85,7 +86,8 @@ export default defineComponent({
         UiText,
         UiNumberInput,
         UiDateInput,
-        UiTimeInput },
+        UiTimeInput,
+        UiForm },
     props: {
         user: Object,
     },

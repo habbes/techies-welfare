@@ -10,15 +10,20 @@
                     <UiNumberInput label="Total contribution" :modelValue="totalContribution" disabled />
                     <UiTextInput label="Email address" type="email" v-model="user.email" disabled />
                     <UiTextInput label="Team" v-model="user.team" disabled />
-                    <UiSelect label="Status" v-model="user.status">
+                    <UiSelect label="Status" v-model="user.status" disabled>
                         <UiSelectOption label="Active" value="active" />
                         <UiSelectOption label="Disabled" value="disabled" />
                     </UiSelect>
                     <UiNumberInput label="Arrears" :modelValue="arrears" disabled  />
                 </UiGridLayout>
+                <!-- <hr/> -->
+                <UiH3>Roles</UiH3>
                 <UiLayout smallGap>
-                    <UiButton>Save changes</UiButton>
-                    <UiButton secondary>Cancel</UiButton>
+                    <UiText v-for="role in user.roles" :key="role" bold>{{ role }}</UiText>
+                </UiLayout>
+                <UiLayout smallGap>
+                    <UiButton v-if="!isAdmin">Promote to admin</UiButton>
+                    <UiRouterButton :to="{ name: 'admin-members' }" secondary>Cancel</UiRouterButton>
                 </UiLayout>
             </UiLayout>
         </UiCard>
@@ -107,6 +112,9 @@ export default defineComponent({
             return new Date(user.value.joinedAt || user.value.createdAt);
         });
 
+        const isAdmin = computed(() =>
+            !!(user.value && user.value.roles.find(r => r === 'admin')));
+
         const arrears = computed(() => {
             if (!user.value) return 0;
 
@@ -143,7 +151,8 @@ export default defineComponent({
             isAddPaymentPaneOpen,
             openAddPaymentPane,
             closeAddPaymentPane,
-            onAddPayment
+            onAddPayment,
+            isAdmin
         }
     },
 })

@@ -21,6 +21,8 @@ import UiTH from "./table/th.vue";
 import UiTR from "./table/tr.vue";
 import UiTD from "./table/td.vue";
 import UiText from "./text/text.vue";
+import UiTextBlock from "./text/text-block.vue";
+import UiCodeBlock from "./text/code-block.vue";
 import UiTextArea from "./input/text-area.vue";
 import UiTextInput from "./input/text-input.vue";
 import UiSelect from "./input/select.vue";
@@ -86,4 +88,6 @@ export {
   UiDropdownItem,
   UiChevronDownIcon,
   UiText,
+  UiTextBlock,
+  UiCodeBlock
 };

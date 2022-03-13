@@ -1,28 +1,44 @@
 <template>
-    <ui-dialog ref="dialog" @open="getPreview" title="Confirm message to send">
-        <div v-if="loadingPreview">
+    <UiDialog ref="dialog" @open="getPreview" title="Confirm message to send">
+        <UiLayout v-if="loadingPreview">
             Generating preview. Please wait...
-        </div>
-        <div>
-            <p class="mb-3">
+        </UiLayout>
+        <UiLayout vertical smallGap>
+            <UiTextBlock>
                 Here's a preview of the message that will be sent to the following recipients:
-            <span class="font-mono inline-block mr-3" v-for="recipient in recipients" :key="recipient">{{ recipient }}</span>
-            </p>
-            <p class="mb-3 border border-gray-100 bg-gray-50 font-mono p-3 overflow-auto text-sm" v-if="preview">
+                <UiText monospace v-for="recipient in recipients" :key="recipient">{{ recipient }}, </UiText>
+            </UiTextBlock>
+            <UiCodeBlock v-if="preview">
                 {{ preview }}
-            </p>
-            <div class="flex justify-end gap-2">
-                <ui-button primary @click="sendMessage">Proceed to send message</ui-button>
-                <ui-button class="ml-2" @click="close">Cancel</ui-button>
-            </div>
-        </div>
-    </ui-dialog>
+            </UiCodeBlock>
+            <UiLayout smallGap>
+                <UiButton @click="sendMessage">Proceed to send message</UiButton>
+                <UiButton secondary @click="close">Cancel</UiButton>
+            </UiLayout>
+        </UiLayout>
+    </UiDialog>
 </template>
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, PropType } from 'vue'
 import { apiClient } from '../../api-client';
+import {
+    UiDialog,
+    UiText,
+    UiTextBlock,
+    UiCodeBlock,
+    UiLayout,
+    UiButton
+} from "../../ui-components";
 
 export default defineComponent({
+    components: {
+        UiDialog,
+        UiText,
+        UiTextBlock,
+        UiCodeBlock,
+        UiLayout,
+        UiButton
+    },
     props: {
         message: String,
         recipients: Array as PropType<string[]>,
