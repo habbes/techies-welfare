@@ -1,12 +1,11 @@
 <template>
     <UiCard>
         <UiH3>Register payment made offline</UiH3>
-        <form class="w-1/2" @submit.prevent="submitForm">
+        <UiForm class="w-1/2" @submit="submitForm">
             <UiLayout smallGap vertical>
-                <UiTextInput
+                <UiNumberInput
                     v-model="amount"
                     label="Amount"
-                    type="number"
                     required
                     full/>
                 <UiTextInput
@@ -15,17 +14,15 @@
                     required
                     full/>
                 <UiLayout smallGap>
-                    <UiTextInput
-                    v-model="txDate"
-                    label="Transaction Date"
-                    type="date"
-                    required/>
+                    <UiDateInput
+                        v-model="txDate"
+                        label="Transaction Date"
+                        required/>
 
-                    <UiTextInput
-                    v-model="txTime"
-                    label="Time"
-                    type="time"
-                    required/>
+                    <UiTimeInput
+                        v-model="txTime"
+                        label="Time"
+                        required/>
                 </UiLayout>
                 <UiTextArea
                     v-model="details"
@@ -36,7 +33,7 @@
                     <UiButton @click="cancel" secondary>Cancel</UiButton>
                 </UiLayout>
             </UiLayout>
-        </form>
+        </UiForm>
         <UiDialog ref="confirmDialog" title="Confirm payment details">
             <UiLayout vertical smallGap>
                 <UiLayout vertical tinyGap>
@@ -60,35 +57,61 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { apiClient } from "../../../api-client";
-import { UiInputGroup, UiTextInput, UiTextArea, UiLayout, UiDialog, UiCard, UiH3, UiButton, UiText } from "../../../ui-components";
+import {
+    UiInputGroup,
+    UiTextInput,
+    UiTextArea,
+    UiLayout,
+    UiDialog,
+    UiCard,
+    UiH3,
+    UiButton,
+    UiText,
+    UiNumberInput,
+    UiDateInput,
+    UiTimeInput,
+    UiForm
+} from "../../../ui-components";
 
 export default defineComponent({
-    components: { UiInputGroup, UiTextInput, UiTextArea, UiLayout, UiDialog, UiCard, UiH3, UiButton, UiText },
+    components: {
+        UiInputGroup,
+        UiTextInput,
+        UiTextArea,
+        UiLayout,
+        UiDialog,
+        UiCard,
+        UiH3,
+        UiButton,
+        UiText,
+        UiNumberInput,
+        UiDateInput,
+        UiTimeInput,
+        UiForm },
     props: {
         user: Object,
     },
     emits: ['cancel', 'addPayment'],
     setup(props, { emit }) {
         const amount = ref(0);
-        const txDate = ref(new Date().toISOString().split("T")[0]);
-        const txTime = ref("00:00");
+        const txDate = ref(new Date());
+        const txTime = ref({ hour: 0, minute: 0});
         const details = ref('');
         const reference = ref('');
         const confirmDialog = ref();
 
         const dateTime = computed(() => {
             const d = new Date(txDate.value);
-            const [h, m] = txTime.value.split(":");
-            d.setHours(Number(h));
-            d.setMinutes(Number(m));
+            d.setHours(txTime.value.hour);
+            d.setMinutes(txTime.value.minute);
 
             return d;
         });
 
         function resetForm() {
             amount.value = 0;
-            txDate.value = new Date().toISOString().split("T")[0];
-            txTime.value = "00:00";
+            txDate.value = new Date();
+            txTime.value = { hour: 0, minute: 0 };
             details.value = '';
             reference.value = '';
         }

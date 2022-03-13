@@ -75,6 +75,10 @@ export const getUserAccountSummary = makeCommand((user: string, context: IComman
     context.services.users.getAccountSummary(user),
     [requireScopes('Transactions.Read.All', 'Users.Read.All')]);
 
+export const makeUserAdmin = makeCommand((user: string, context: ICommandContext) =>
+    context.services.users.makeAdmin(user),
+    [requireScopes('Users.Write.All')]);
+
 export const getTransactions = makeCommand((_, context: ICommandContext) =>
     context.services.transactions.getAll(),
     [requireScopes('Transactions.Read.All')]);

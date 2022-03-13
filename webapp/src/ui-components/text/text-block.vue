@@ -1,11 +1,15 @@
 <template>
-    <span :class="classes">
+    <p :class="classes">
         <slot></slot>
-    </span>
+    </p>
 </template>
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
 
+/**
+ * A block or paragraph of text
+ * that can nest other inline text elements.
+ */
 export default defineComponent({
     props: {
         /**
@@ -45,7 +49,6 @@ export default defineComponent({
         const classes = computed(() => {
             const normal = !(props.primary || props.secondary || props.danger);
             return {
-                // we use the secondary color for as default text color
                 'text-secondary': normal,
                 'text-primary': props.primary,
                 'text-body': props.secondary,

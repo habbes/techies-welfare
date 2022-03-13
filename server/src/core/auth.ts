@@ -15,6 +15,7 @@ export type Permission =
     | 'Users.Read.Self'
     | 'Users.Read.All'
     | 'Users.Create'
+    | 'Users.Write.All'
     | 'Users.Logout.Self'
     | 'Users.LogoutAll.Self'
     | 'Transactions.Read.All'
@@ -37,6 +38,7 @@ const rolePermissions: Record<Role, Permission[]> = {
         'Users.Read.Self',
         'Users.Read.All',
         'Users.Create',
+        'Users.Write.All',
         'Users.Logout.Self',
         'Users.LogoutAll.Self',
         'Transactions.Read.All',

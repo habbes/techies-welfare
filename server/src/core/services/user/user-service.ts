@@ -166,6 +166,28 @@ export class UserService implements IUserService {
         }
     }
 
+    async makeAdmin(id: string): Promise<IUser> {
+        try {
+            const res = await this.collection.findOneAndUpdate({
+                _id: id
+            }, {
+                $addToSet: { roles: 'admin' }
+            }, {
+                returnDocument: 'after'
+            })
+
+            if (!res.ok) {
+                throw createAppError('Failed to update user');
+            }
+
+            return res.value;
+        }
+        catch (e) {
+            rethrowIfAppError(e);
+            throw createDbError(e.message);
+        }
+    }
+
     async requestTemporaryPassCode(args: RequestPassCodeArgs): Promise<void> {
         try {
             const user = await this.collection.findOne({ $or: [{ phone: args.login }, { email: args.login }] });

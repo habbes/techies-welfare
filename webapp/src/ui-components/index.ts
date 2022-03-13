@@ -21,8 +21,15 @@ import UiTH from "./table/th.vue";
 import UiTR from "./table/tr.vue";
 import UiTD from "./table/td.vue";
 import UiText from "./text/text.vue";
+import UiTextBlock from "./text/text-block.vue";
+import UiCodeBlock from "./text/code-block.vue";
 import UiTextArea from "./input/text-area.vue";
 import UiTextInput from "./input/text-input.vue";
+import UiSelect from "./input/select.vue";
+import UiSelectOption from "./input/select-option.vue";
+import UiNumberInput from "./input/number-input.vue";
+import UiDateInput from "./input/date-input.vue";
+import UiTimeInput from "./input/time-input.vue";
 import UiDropdown from "./dropdown/dropdown.vue";
 import UiDropdownItem from "./dropdown/dropdown-item.vue";
 import UiChevronDownIcon from "./icons/chevron.vue";
@@ -60,6 +67,11 @@ export {
   UiInputGroup,
   UiTextInput,
   UiTextArea,
+  UiNumberInput,
+  UiDateInput,
+  UiTimeInput,
+  UiSelect,
+  UiSelectOption,
   UiH2,
   UiH3,
   UiPseudoLink,
@@ -76,4 +88,6 @@ export {
   UiDropdownItem,
   UiChevronDownIcon,
   UiText,
+  UiTextBlock,
+  UiCodeBlock
 };

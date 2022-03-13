@@ -1,4 +1,4 @@
-import { Express, Router } from "express";
+import { Router } from "express";
 import {
     createUser,
     getUsers,
@@ -18,7 +18,8 @@ import {
     getTransactionByProviderAndId,
     getTransactionById,
     getMyTransactionById,
-    requestTemporaryPassCode
+    requestTemporaryPassCode,
+    makeUserAdmin
 } from "../core";
 import { requireAuth, wrapResponse } from "./middleware";
 
@@ -44,6 +45,9 @@ router.post("/preview-message", requireAuth(), wrapResponse(req =>
 
 router.post("/users", requireAuth(), wrapResponse(req => 
     req.commands.execute(createUser, req.body)));
+
+router.post("/users/:id/make-admin", requireAuth(), wrapResponse(req =>
+    req.commands.execute(makeUserAdmin, req.params.id)));
 
 router.get("/users", requireAuth(), wrapResponse(req =>
     req.commands.execute(getUsers, undefined)));

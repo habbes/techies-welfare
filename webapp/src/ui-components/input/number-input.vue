@@ -2,9 +2,9 @@
   <div class="">
     <label v-if="label" class="block text-sm mb-1 text-body">{{ label }}</label>
     <input
-      :type="password ? 'password' : type ? type : 'text'"
+      type="number"
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="$emit('update:modelValue', Number($event.target.value))"
       style="font-size:14px"
       :class="classes"
       :placeholder="placeholder"
@@ -18,16 +18,7 @@ import { getTextFieldCommonClasses, getTextFieldCommonProps } from "./util";
 export default defineComponent({
   props: {
     ...getTextFieldCommonProps(),
-    /**
-     * Input type, possible options are `text`, `email`, `tel`
-     */
-    type: String,
-    modelValue: String,
-    /**
-     * Whether this should be treated as password
-     * input, i.e. hidden input value
-     */
-    password: Boolean,
+    modelValue: Number
   },
   emits: ["update:modelValue"],
   setup(props) {
