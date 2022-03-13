@@ -12,7 +12,7 @@
             <div class="flex-col mr-3">
               <div class="text-base">{{ user.name }}</div>
               <div class="text-sm text-secondary-light">
-                {{ user.roles[0] }}
+                {{ getRoleDisplayName(getUserRole(user)) }}
               </div>
             </div>
             <span class="text-secondary-light"
@@ -24,7 +24,7 @@
           </div>
         </template>
         <UiDropdownItem> My account </UiDropdownItem>
-        <UiDropdownItem :route="{ name: 'admin' }">
+        <UiDropdownItem :route="{ name: 'admin-members' }" v-if="isUserAdmin(user)">
           Admin dashboard
         </UiDropdownItem>
         <UiDropdownItem @click="logout"> Sign out </UiDropdownItem>
@@ -35,7 +35,7 @@
 <script lang="ts">
 import { defineComponent, PropType, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { IUser } from "../services";
+import { IUser, getRoleDisplayName, getUserRole, isUserAdmin } from "../services";
 import { clearSession } from "../store";
 import { authService } from "../auth";
 import {
@@ -62,7 +62,10 @@ export default defineComponent({
     }
 
     return {
-      logout
+      logout,
+      getRoleDisplayName,
+      getUserRole,
+      isUserAdmin
     }
   },
 });

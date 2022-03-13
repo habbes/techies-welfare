@@ -16,14 +16,13 @@
                     </UiSelect>
                     <UiNumberInput label="Arrears" :modelValue="arrears" disabled  />
                 </UiGridLayout>
-                <!-- <hr/> -->
                 <UiH3>Roles</UiH3>
                 <UiLayout smallGap>
-                    <UiText v-for="role in user.roles" :key="role" bold>{{ role }}</UiText>
+                    <UiText v-for="role in user.roles" :key="role" bold>{{ getRoleDisplayName(role) }}</UiText>
                 </UiLayout>
                 <UiLayout smallGap>
-                    <UiButton v-if="!isAdmin">Promote to admin</UiButton>
-                    <UiRouterButton :to="{ name: 'admin-members' }" secondary>Cancel</UiRouterButton>
+                    <UiButton v-if="!isUserAdmin(user)" @click="openMakeAdminDialog">Promote to admin</UiButton>
+                    <UiRouterButton :to="{ name: 'admin-members' }" secondary>Go Back</UiRouterButton>
                 </UiLayout>
             </UiLayout>
         </UiCard>
@@ -41,11 +40,25 @@
             </UiLayout>
             <TransactionsTable :transactions="transactions" />
         </UiLayout>
+        <UiDialog ref="makeAdminDialog" v-if="user" title="Promote user to admin">
+            <UiLayout vertical smallGap>
+                <UiTextBlock>
+                    Are you sure you want to promote
+                    <UiText block>{{ user.name }}</UiText>
+                    to administrator?
+                </UiTextBlock>
+                <UiLayout smallGap>
+                    <UiButton @click="makeAdmin">Promote to admin</UiButton>
+                    <UiButton secondary @click="cancelMakeAdmin">Cancel</UiButton>
+                </UiLayout>
+            </UiLayout>
+        </UiDialog>
     </UiLayout>
 </template>
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { getRoleDisplayName, isUserAdmin } from "../../../services";
 import { apiClient } from "../../../api-client";
 import AddPayment from "./add-payment.vue";
 import TransactionsTable from "../../../components/transactions-table.vue";
@@ -56,7 +69,9 @@ import {
     UiButton,
     UiRouterButton,
     UiCard,
+    UiDialog,
     UiText,
+    UiTextBlock,
     UiTextInput,
     UiDateInput,
     UiSelect,
@@ -76,7 +91,9 @@ export default defineComponent({
         UiButton,
         UiRouterButton,
         UiCard,
+        UiDialog,
         UiText,
+        UiTextBlock,
         UiTextInput,
         UiNumberInput,
         UiDateInput,
@@ -88,6 +105,7 @@ export default defineComponent({
         const transactions = ref([]);
         const isAddPaymentPaneOpen = ref(false);
         const addPaymentPane = ref();
+        const makeAdminDialog = ref<typeof UiDialog>();
 
         onMounted(async () => {
             const route = useRoute();
@@ -111,9 +129,6 @@ export default defineComponent({
         const memberSince = computed(() => {
             return new Date(user.value.joinedAt || user.value.createdAt);
         });
-
-        const isAdmin = computed(() =>
-            !!(user.value && user.value.roles.find(r => r === 'admin')));
 
         const arrears = computed(() => {
             if (!user.value) return 0;
@@ -141,6 +156,26 @@ export default defineComponent({
             closeAddPaymentPane();
         }
 
+        function openMakeAdminDialog() {
+            makeAdminDialog.value?.open();
+        }
+
+        async function makeAdmin() {
+            try {
+                user.value = await apiClient.makeUserAdmin(user.value._id);
+                makeAdminDialog.value?.close();
+                alert(`Successfully promoted ${user.value.name} to admin.`);
+            }
+            catch (e) {
+                alert(`Error: ${e.message}`);
+                console.dir(e);
+            }
+        }
+
+        function cancelMakeAdmin() {
+            makeAdminDialog.value?.close();
+        }
+
         return {
             user,
             transactions,
@@ -152,7 +187,12 @@ export default defineComponent({
             openAddPaymentPane,
             closeAddPaymentPane,
             onAddPayment,
-            isAdmin
+            isUserAdmin,
+            getRoleDisplayName,
+            makeAdminDialog,
+            openMakeAdminDialog,
+            cancelMakeAdmin,
+            makeAdmin
         }
     },
 })

@@ -121,7 +121,11 @@ export class ApiClient {
     }
 
     requestOtp(args: { login: string }) {
-        return getData(this.httpClient.post(`/auth/request-otp`, args))
+        return getData(this.httpClient.post(`/auth/request-otp`, args));
+    }
+
+    makeUserAdmin(id: string) {
+        return getData(this.httpClient.post(`/users/${id}/make-admin`));
     }
 
     getAllTransactions() {
