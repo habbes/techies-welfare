@@ -49,7 +49,7 @@ export class FlutterwavePaymentProvider implements IPaymentHandler<FlutterwavePr
                     }
                 }
             );
-
+    
             return {
                 providerTransactionId: data.tx_ref,
                 status: res.data.status === 'success' ? 'pending' : 'failed',

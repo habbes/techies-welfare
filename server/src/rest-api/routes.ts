@@ -20,7 +20,8 @@ import {
     getTransactionById,
     getMyTransactionById,
     requestTemporaryPassCode,
-    makeUserAdmin
+    makeUserAdmin,
+    initiateTransactionForUser
 } from "../core";
 import { requireAuth, wrapResponse } from "./middleware";
 
@@ -83,7 +84,12 @@ router.get("/users/:id", requireAuth(), wrapResponse(req =>
 router.get("/users/:id/transactions", requireAuth(), wrapResponse(req =>
     req.commands.execute(getUserTransactions, req.params.id)));
 
-router.post("/transactions", wrapResponse(req => {
+// this handles payment requests initiated from payment links
+// and does not require authentication
+router.post("/transactions/initiate", wrapResponse(req =>
+    req.commands.execute(initiateTransactionForUser, req.body)));
+
+router.post("/transactions", requireAuth(), wrapResponse(req => {
     // cast dates to avoid validation errors
     // TODO maybe this should be done directly by the command validator?
     const data = { ...req.body };

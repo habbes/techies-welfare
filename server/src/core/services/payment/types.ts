@@ -47,6 +47,10 @@ export interface InitiatePaymentArgs {
     type: TransactionType;
 }
 
+export interface InitiatePaymentForUserArgs extends InitiatePaymentArgs {
+    userId: string;
+}
+
 export interface PaymentRequestResult<TProviderMetadata = Record<string, any>> {
     providerTransactionId: string;
     status: TransactionStatus;

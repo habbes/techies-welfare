@@ -137,7 +137,7 @@ export class ApiClient {
     }
 
     initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
-        return getData(this.httpClient.post(`/users/${userId}/pay`, { amount, type }));
+        return getData(this.httpClient.post(`/transactions/initiate`, { userId, amount, type }));
     }
 
     addManualPayment(args: ManualEntryTransactionArgs) {

@@ -14,6 +14,10 @@ export function getPreviewUser(): IUser {
             type: "user",
             _id: "adminId"
         },
+        updatedBy: {
+            type: "user",
+            _id: "dummy_user"
+        },
         status: "active",
         idNumber: "id",
         roles: ['member']

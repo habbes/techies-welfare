@@ -76,12 +76,18 @@ export const routes: RouteRecordRaw[] = [
     {
         path: '/pay',
         component: PaymentPage,
-        name: "pay"
+        name: "pay",
+        meta: {
+            noAuth: true
+        }
     },
     {
         path: '/post-payment/flutterwave',
         component: FlutterWavePostPaymentPage,
-        name: 'flutterwave-post-payment'
+        name: 'flutterwave-post-payment',
+        meta: {
+            noAuth: true
+        }
     },
     {
         path: '/auth-response',

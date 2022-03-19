@@ -18,7 +18,9 @@ import {
     createManualTransactionValidator,
     getTransactionByProviderAndIdValidator,
     initiatePaymentValidator,
-    previewMessageValidator
+    previewMessageValidator,
+    InitiatePaymentForUserArgs,
+    initiateTransactionForUserValidator
 } from "../services";
 import { createUserPrincipal } from "..";
 import { stringValidator } from "../../util";
@@ -82,6 +84,22 @@ export const getMyTransactionById = makeCommand((transactionId: string, context:
 export const initiateTransaction = makeCommand((args: InitiatePaymentArgs, context: ICommandContext) =>
     context.services.users.initiatePayment(context.authContext.user._id, args),
     [requireScopes('Transactions.Initiate.Self'), validate(initiatePaymentValidator)]);
+
+/**
+ * This initiates a transaction request for the specified user. It's meant to handle
+ * payment requests that were initiate from a payment link. For a convenient user
+ * experience, I wanted the user to be able to open the link directly and pay without
+ * having to log in first, that's why this command does not require authentication.
+ * This means that someone else gets the payment link for a user (which is currently generated
+ * deterministically from concatenating user details), they can initiate payment for a different user.
+ * While they will not be able to carry out a transaction without the user's phone and MPESA PIN or debit/credit
+ * card details, it's still not ideal. We could consider generating the links randomly and making
+ * them ephemeral to be re-generated each time, and verified in the db (like short-lived tokens).
+ * That would make things a bit more complex. I will probably revisit this later.
+ */
+export const initiateTransactionForUser = makeCommand((args: InitiatePaymentForUserArgs, context: ICommandContext) =>
+    context.services.users.initiatePayment(args.userId, args),
+    [validate(initiateTransactionForUserValidator)]);
 
 export const getMyAccountSummary = makeCommand((_, context: ICommandContext) =>
     context.services.users.getAccountSummary(context.authContext.user._id),
