@@ -58,6 +58,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { showError, showSuccess } from "../../../toasts";
 import { getRoleDisplayName, isUserAdmin } from "../../../services";
 import { apiClient } from "../../../api-client";
 import AddPayment from "./add-payment.vue";
@@ -112,11 +113,10 @@ export default defineComponent({
             const userId = route.params.id as string;
             try {
                 user.value = await apiClient.getUserById(userId);
-                console.log('user retrieved', user);
                 transactions.value = await apiClient.getUserTransactions(userId);
             }
             catch (e) {
-                alert(e.message);
+                showError(e.message);
             }
         });
 
@@ -164,11 +164,10 @@ export default defineComponent({
             try {
                 user.value = await apiClient.makeUserAdmin(user.value._id);
                 makeAdminDialog.value?.close();
-                alert(`Successfully promoted ${user.value.name} to admin.`);
+                showSuccess(`Successfully promoted ${user.value.name} to admin.`);
             }
             catch (e) {
-                alert(`Error: ${e.message}`);
-                console.dir(e);
+                showError(e.message);
             }
         }
 

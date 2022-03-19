@@ -28,6 +28,7 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { apiClient } from "../../api-client";
 import { useUser } from "../../store";
+import { showError } from "../../toasts";
 import {
     UiLayout, UiText, UiH2, UiLink,
     UiTextInput, UiButton, UiTable,
@@ -62,7 +63,12 @@ export default defineComponent({
         const accountSummary = userStore.accountSummary;
 
         onMounted(async() => {
-            transactions.value = await apiClient.getMyTransactions();
+            try {
+                transactions.value = await apiClient.getMyTransactions();
+            }
+            catch (e) {
+                showError(e.message);
+            }
         });
 
         function openPaymentDialog() {

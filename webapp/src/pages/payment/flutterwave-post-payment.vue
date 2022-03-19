@@ -18,7 +18,7 @@
             </UiText>
 
             <UiLayout class="mt-5">
-                <UiRouterButton to="/" secondary>Back to home page.</UiRouterButton>
+                <UiRouterButton to="/" secondary>Back to home page</UiRouterButton>
             </UiLayout>
         </UiLayout>
     </UiCard>
@@ -28,6 +28,7 @@ import { defineComponent, ref, onMounted } from 'vue'
 import { useRoute } from "vue-router";
 import { apiClient } from "../../api-client";
 import { useUser } from "../../store";
+import { showError } from "../../toasts";
 import { UiCard, UiRouterButton, UiLayout, UiText } from "../../ui-components";
 
 export default defineComponent({
@@ -53,7 +54,7 @@ export default defineComponent({
                     }
                 }
                 catch (e) {
-                    alert(e.message);
+                    showError(e.message);
                 }
                 verifying.value = false;
             }

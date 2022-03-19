@@ -55,7 +55,8 @@
     </UiCard>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent, ref, computed } from 'vue';
+import { showError, showSuccess } from "../../../toasts";
 import { apiClient } from "../../../api-client";
 import {
     UiInputGroup,
@@ -148,9 +149,10 @@ export default defineComponent({
                 resetForm();
                 closeDialog();
                 emit("addPayment", res);
+                showSuccess("Payment registered successfully.");
             }
             catch (e) {
-                alert(e.message);
+                showError(e.message);
             }
         }
 

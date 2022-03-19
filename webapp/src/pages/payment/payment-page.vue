@@ -21,6 +21,7 @@
 import { defineComponent, ref } from 'vue';
 import { useRoute } from "vue-router";
 import { apiClient } from "../../api-client";
+import { showError } from "../../toasts";
 import UiTextInput from "../../ui-components/input/text-input.vue";
 import UiButton from "../../ui-components/button/button.vue";
 import UiCard from "../../ui-components/card/card.vue";
@@ -50,8 +51,9 @@ export default defineComponent({
         }
       }
       catch (e) {
-        alert(e.message);
+        showError(e.message);
       }
+
       loading.value = false;
     }
 
