@@ -110,6 +110,7 @@
 import { defineComponent, ref, reactive } from 'vue';
 import { useRouter } from "vue-router";
 import { apiClient } from "../../../api-client";
+import {showError, showSuccess } from "../../../toasts";
 import {
     UiButton,
     UiGridLayout,
@@ -200,9 +201,10 @@ export default defineComponent({
                 const user = await apiClient.createUser(args);
                 closeDialog();
                 resetForm();
+                showSuccess(`User ${user.name} has been successfully registered.`);
             }
             catch (e) {
-                alert(`Error: ${e.message}`);
+                showError(e.message);
             }
 
         }

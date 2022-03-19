@@ -46,6 +46,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router';
+import { showError, showInfo } from "../../toasts";
 import { apiClient } from "../../api-client";
 import { authService } from "../../auth";
 import { LocalAuthService } from '../../services';
@@ -94,12 +95,23 @@ export default defineComponent({
         }
 
         async function submitUsername() {
-            await apiClient.requestOtp({ login: login.value });
-            state.value = 'enterOtp';
+            try {
+                await apiClient.requestOtp({ login: login.value });
+                state.value = 'enterOtp';
+            }
+            catch (e) {
+                showError(e.message);
+            }
         }
 
         async function resendCode() {
-            await apiClient.requestOtp({ login: login.value });
+            try {
+                await apiClient.requestOtp({ login: login.value });
+                showInfo("Passcode has been resent.")
+            }
+            catch (e) {
+                showError(e.message);
+            }
         }
 
         async function submitLogin() {
@@ -125,8 +137,7 @@ export default defineComponent({
                 reset();
             }
             catch (e) {
-                // TODO: proper error handling
-                alert(e.message);
+                showError(e.message);
             }
         }
 

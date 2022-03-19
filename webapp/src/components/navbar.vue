@@ -38,6 +38,7 @@ import { useRouter } from "vue-router";
 import { IUser, getRoleDisplayName, getUserRole, isUserAdmin } from "../services";
 import { clearSession } from "../store";
 import { authService } from "../auth";
+import { showError } from "../toasts";
 import {
   UiDropdown,
   UiDropdownItem,
@@ -53,12 +54,17 @@ export default defineComponent({
     const router = useRouter();
 
     async function logout() {
-      clearSession();
-      await authService.logout();
-      // TODO: ideally we should not manually redirect to login
-      // since authService.logout() should handle that
-      // but because of a bug, that tends to fail
-      router.push({ name: "login" });
+      try {
+        clearSession();
+        await authService.logout();
+        // TODO: ideally we should not manually redirect to login
+        // since authService.logout() should handle that
+        // but because of a bug, that tends to fail
+        router.push({ name: "login" });
+      }
+      catch (e) {
+        showError(e.message);
+      }
     }
 
     return {

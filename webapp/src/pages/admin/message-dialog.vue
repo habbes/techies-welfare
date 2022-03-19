@@ -21,6 +21,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, PropType } from 'vue'
 import { apiClient } from '../../api-client';
+import { showError, showInfo } from "../../toasts";
 import {
     UiDialog,
     UiText,
@@ -64,16 +65,21 @@ export default defineComponent({
                     preview.value = res.message;
                 }
                 catch (e) {
-                    alert(e.message);
+                    showError(e.message);
                 }
                 loadingPreview.value = false;
             }
         }
 
         async function sendMessage() {
-            const report = await apiClient.sendMessage({ message: props.message, recipients: props.recipients });
-            close();
-            alert(`Message sent.\nNumber of recipients: ${report.numRecipients}\nMessages failed: ${report.numFailed}`);
+            try {
+                const report = await apiClient.sendMessage({ message: props.message, recipients: props.recipients });
+                close();
+                showInfo(`Message sent.\nNumber of recipients: ${report.numRecipients}\nMessages failed: ${report.numFailed}`);
+            }
+            catch (e) {
+                showError(e.message);
+            }
         }
 
         return {

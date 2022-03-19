@@ -241,7 +241,7 @@ export class TransactionService implements ITransactionService {
                     updatedAt: new Date(),
                     amount: providerResult.amount
                 }
-            }, { returnOriginal: false });
+            }, { returnDocument: 'after' });
 
         if (!updatedRes.value) throw createResourceNotFoundError("Transaction not found");
         return updatedRes.value;

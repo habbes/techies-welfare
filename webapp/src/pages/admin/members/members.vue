@@ -43,6 +43,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue'
 import { apiClient } from "../../../api-client";
+import { showError } from "../../../toasts";
 import { UiLayout, UiText, UiH2, UiLink, UiTextInput, UiRouterButton, UiTable, UiTH, UiTHead, UiTD, UiTR, UiTBody } from "../../../ui-components";
 
 export default defineComponent({
@@ -65,7 +66,12 @@ export default defineComponent({
         const searchTerm = ref('');
 
         onMounted(async() => {
-            users.value = await apiClient.getAllUsers();
+            try {
+                users.value = await apiClient.getAllUsers();
+            }
+            catch (e) {
+                showError(e.message);
+            }
         });
 
         const filteredUsers = computed(() => {

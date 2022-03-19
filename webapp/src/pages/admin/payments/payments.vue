@@ -9,6 +9,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
 import { apiClient } from "../../../api-client";
+import { showError } from "../../../toasts";
 import TransactionsTable from "../../../components/transactions-table.vue";
 
 export default defineComponent({
@@ -16,7 +17,12 @@ export default defineComponent({
     setup() {
         const transactions = ref([]);
         onMounted(async () => {
-            transactions.value = await apiClient.getAllTransactions();
+            try {
+                transactions.value = await apiClient.getAllTransactions();
+            }
+            catch (e) {
+                showError(e.message);
+            }
         });
 
         return {

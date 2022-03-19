@@ -12,6 +12,7 @@ import { UiChevronDownIcon, UiDropdown, UiDropdownItem } from "../../ui-componen
 import NavBar from "../../components/navbar.vue";
 import { authService } from "../../auth";
 import { useUser } from "../../store";
+import { showError } from "../../toasts";
 import { apiClient } from '../../api-client';
 
 export default defineComponent({
@@ -25,14 +26,20 @@ export default defineComponent({
                     await authService.login();
                 }
                 catch (err) {
+                    showError(err.message);
                 }
             }
             else {
-                const user = await apiClient.getLoggedInUser();
-                const accountSummary = await apiClient.getMyAccountSummary();
-                const userStore = useUser();
-                userStore.setUser(user);
-                userStore.updateAccountSummary(accountSummary);
+                try {
+                    const user = await apiClient.getLoggedInUser();
+                    const accountSummary = await apiClient.getMyAccountSummary();
+                    const userStore = useUser();
+                    userStore.setUser(user);
+                    userStore.updateAccountSummary(accountSummary);
+                }
+                catch (e) {
+                    showError(e.message);
+                }
             }
         });
 

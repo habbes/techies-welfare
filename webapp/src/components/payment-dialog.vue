@@ -13,6 +13,7 @@
 import { defineComponent, ref } from 'vue';
 import { UiDialog, UiTextInput, UiLayout, UiButton } from "../ui-components";
 import { apiClient } from "../api-client";
+import { showError } from "../toasts";
 
 export default defineComponent({
     components: { UiDialog, UiTextInput, UiLayout, UiButton },
@@ -44,7 +45,7 @@ export default defineComponent({
                 }
             }
             catch (e) {
-                alert(e);
+                showError(e.message);
             }
         }
 
