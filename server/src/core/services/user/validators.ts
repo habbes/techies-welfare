@@ -19,7 +19,7 @@ export const createUserValidator = Joi.object({
     team: Joi.string().allow(""),
     idNumber: Joi.string().allow(""),
     nextOfKin: Joi.object({
-        name: Joi.string().required(),
+        name: Joi.string().allow(""),
         phone: Joi.string().regex(PHONE_REGEX).allow(""),
         email: Joi.string().email().allow(""),
         relationship: Joi.string().allow("")

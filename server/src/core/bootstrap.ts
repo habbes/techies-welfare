@@ -43,7 +43,11 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
     const messageTransport = new SmsMessageTransport({ smsService });
 
     const transactions = new TransactionService(db, { paymentHandlers });
+    await transactions.createIndexes();
+
     const users = new UserService(db, { transactions, settings, messageTransport });
+    await users.createIndexes();
+
     const system = new SystemService({ users });
 
     const linkGenerator = new LinkGeneratorService({ baseUrl: config.webAppBaseUrl });

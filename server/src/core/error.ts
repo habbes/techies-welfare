@@ -17,6 +17,7 @@ export class AppError extends Error {
  */
 export function isMongoDuplicateKeyError(error: MongoError, key?: any): boolean {
     const MONGO_ERROR_DUPLICATE_KEY = 11000;
+
     if (error.code !== MONGO_ERROR_DUPLICATE_KEY) {
         return false;
     }
@@ -25,7 +26,7 @@ export function isMongoDuplicateKeyError(error: MongoError, key?: any): boolean 
         return true;
     }
 
-    return error.message.indexOf(key) > 0;
+    return error.message.includes(key);
 }
 
 export type ErrorMessage = string | { message: string };

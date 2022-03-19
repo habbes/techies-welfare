@@ -69,6 +69,7 @@ export class UserService implements IUserService {
     private transactions: ITransactionService;
     private settings: IAppSettingsService;
     private messageTransport: IMessageTransport;
+    private indexesCreated = false;
 
     constructor(db: Db, args: UserServiceArgs) {
         this.collection = db.collection(COLLECTION);
@@ -76,6 +77,21 @@ export class UserService implements IUserService {
         this.transactions = args.transactions;
         this.settings = args.settings;
         this.messageTransport = args.messageTransport;
+    }
+
+    async createIndexes(): Promise<void> {
+        if (this.indexesCreated) return;
+
+        try {
+            await this.collection.createIndex({ email: 1 }, { unique: true });
+            await this.collection.createIndex({ phone: 1 }, { unique: true });
+            await this.tokenCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 1 });
+            
+            this.indexesCreated = true;
+        }
+        catch (e) {
+            throw createDbError(e);
+        }
     }
 
     async create(args: CreateUserArgs, createdBy: IPrincipal): Promise<IUser> {

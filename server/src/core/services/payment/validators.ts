@@ -8,9 +8,9 @@ export const initiatePaymentValidator = Joi.object({
 export const createManualTransactionValidator = Joi.object({
     id: Joi.string().required(),
     fromUser: Joi.string().required(),
-    amount: Joi.number().required(),
+    amount: Joi.number().greater(0).required(),
     metadata: Joi.object({
-        details: Joi.string(),
+        details: Joi.string().allow(""),
         transactionDate: Joi.date().options({ convert: false }).required(),
     }).required()
 });

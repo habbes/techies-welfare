@@ -3,7 +3,7 @@ import { IPrincipal, ITransaction, IUser, TransactionStatus } from "../../models
 import { generateId } from "../../../util";
 import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
 import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
-import { createResourceNotFoundError, rethrowIfAppError, createDbError } from "../..";
+import { createResourceNotFoundError, rethrowIfAppError, createDbError, isMongoDuplicateKeyError, createUniquenessFailedError } from "../../error";
 
 const COLLECTION = "transactions";
 
@@ -14,10 +14,34 @@ export interface TransactionServiceArgs {
 export class TransactionService implements ITransactionService {
     collection: Collection<ITransaction>;
     handlers: IPaymentHandlerProvider;
+    private indexesCreated = false;
 
     constructor(db: Db, args: TransactionServiceArgs) {
         this.collection = db.collection(COLLECTION);
         this.handlers = args.paymentHandlers;
+    }
+
+    async createIndexes(): Promise<void> {
+        if (this.indexesCreated) return;
+
+        try {
+            await this.collection.createIndex({
+                providerTransactionId: 1, provider: 1
+            }, {
+                unique: true,
+                partialFilterExpression: {
+                    providerTransactionId: { $exists: true }
+                }
+            });
+
+            await this.collection.createIndex({ fromUser: 1 });
+            await this.collection.createIndex({ createdAt: -1 });
+
+            this.indexesCreated = true;
+        }
+        catch (e) {
+            throw createDbError(e);
+        }
     }
 
     async initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction<any>> {
@@ -82,7 +106,7 @@ export class TransactionService implements ITransactionService {
         try {
             const now = new Date();
             const provider = this.handlers.get(providerName);
-            const  result = await provider.handlePaymentNotification(notification);
+            const result = await provider.handlePaymentNotification(notification);
 
             const updatedRes = await this.collection.findOneAndUpdate({
                 providerTransactionId: result.providerTransactionId,
@@ -110,10 +134,10 @@ export class TransactionService implements ITransactionService {
             createDbError(e);
         }
     }
-    
+
     async getUserContributionsTotal(userId: string): Promise<number> {
         try {
-            const results = await this.collection.aggregate<{ total : number }>([
+            const results = await this.collection.aggregate<{ total: number }>([
                 {
                     $match: { fromUser: userId, status: 'success' }
                 },
@@ -124,7 +148,7 @@ export class TransactionService implements ITransactionService {
                     }
                 }
             ]).toArray();
-            
+
             if (!results.length) return 0;
 
             return results[0].total;
@@ -148,7 +172,7 @@ export class TransactionService implements ITransactionService {
 
     async getAll(): Promise<ITransaction[]> {
         try {
-            const result = await this.collection.find({ }).sort({ createdAt: -1 }).toArray();
+            const result = await this.collection.find({}).sort({ createdAt: -1 }).toArray();
             return result;
         }
         catch (e) {
@@ -208,17 +232,17 @@ export class TransactionService implements ITransactionService {
 
         const providerResult = await this.handlers.get(trx.provider).getTransaction(trx);
         const updatedRes = await this.collection.findOneAndUpdate(
-            { _id: trx._id }, 
+            { _id: trx._id },
             {
-            $set: {
-                status: providerResult.status,
-                failureReason: providerResult.failureReason,
-                metadata: providerResult.metadata,
-                updatedAt: new Date(),
-                amount: providerResult.amount
-            }
-        }, { returnOriginal: false });
-        
+                $set: {
+                    status: providerResult.status,
+                    failureReason: providerResult.failureReason,
+                    metadata: providerResult.metadata,
+                    updatedAt: new Date(),
+                    amount: providerResult.amount
+                }
+            }, { returnOriginal: false });
+
         if (!updatedRes.value) throw createResourceNotFoundError("Transaction not found");
         return updatedRes.value;
     }
@@ -244,11 +268,15 @@ export class TransactionService implements ITransactionService {
             return res.ops[0];
         }
         catch (e) {
+            if (isMongoDuplicateKeyError(e, 'providerTransactionId')) {
+                throw createUniquenessFailedError('The provider transaction reference ID is already registered.');
+            }
+
             rethrowIfAppError(e);
             throw createDbError(e);
         }
     }
-    
+
 }
 
 
