@@ -32,7 +32,7 @@ in the [webapp](./webapp) directory.
 - [x] User roles and permissions
 - [x] Data validation
 - [x] Proper error handling
-- [ ] Proper error handling and toast notifications on UI
+- [x] Proper error handling and toast notifications on UI
 - [ ] Clean up and improve UI
 - [x] A member should be able to view their own statements
 - [ ] Activity/audit logs
