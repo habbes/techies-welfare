@@ -25,7 +25,7 @@ in the [webapp](./webapp) directory.
 - [x] Allow admin to add new users
 - [x] Allow admin to view details of a particular user
 - [x] Allow admin to view transactions
-- [ ] Allow admin to view details of a particular transactions
+- [ ] Allow admin to view details of a particular transaction
 - [x] Allow admin to record transactions manually
 - [ ] Automatically send monthly report to all users
 - [x] Authentication
@@ -38,3 +38,4 @@ in the [webapp](./webapp) directory.
 - [ ] Activity/audit logs
 - [x] Documentation to help people get started contributing to and running the project locally
 - [ ] Documentation about app architecture and code organization
+- [ ] Doc comments in source code
