@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./validators";
 export { BulkMessageService, BulkMessageServiceArgs } from "./bulk-message-service";
 export { SmsMessageTransportArgs, SmsMessageTransport } from "./sms-transport";
 export { MessageTemplateResolver } from "./template-resolver";
