@@ -1,3 +1,5 @@
+import Joi from "joi";
+import { IValidator, validateWith } from "../../util";
 import { Permission } from "../auth";
 import { createPermissionError } from "../error";
 import { ICommandMiddleware } from "../infra";
@@ -13,6 +15,13 @@ export function requireScopes<TInput>(...scopes: Permission[]): ICommandMiddlewa
             throw createPermissionError();
         }
 
+        return Promise.resolve();
+    }
+}
+
+export function validate<TInput>(validator: IValidator): ICommandMiddleware<TInput, ICommandContext> {
+    return (input, context) => {
+        validateWith(validator, input);
         return Promise.resolve();
     }
 }

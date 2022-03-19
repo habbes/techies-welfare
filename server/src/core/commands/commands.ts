@@ -1,7 +1,17 @@
 import { makeCommand } from "../infra";
 import { ICommandContext } from "./types";
-import { requireScopes } from "./middleware";
-import { BulkMessageReport, BulkMessageSendArgs, CreateUserArgs, InitiatePaymentArgs, LoginArgs, ManualEntryTransactionData, RequestPassCodeArgs, RunSetupArgs } from "../services";
+import { requireScopes, validate } from "./middleware";
+import {
+    BulkMessageReport,
+    BulkMessageSendArgs,
+    CreateUserArgs,
+    InitiatePaymentArgs,
+    LoginArgs,
+    ManualEntryTransactionData,
+    RequestPassCodeArgs,
+    RunSetupArgs,
+    loginValidator
+} from "../services";
 import { createUserPrincipal } from "..";
 
 export const hasSetupRun = makeCommand((_, context: ICommandContext) =>
@@ -33,7 +43,7 @@ export const getUserById = makeCommand((id: string, context: ICommandContext) =>
 
 export const login = makeCommand((args: LoginArgs, context: ICommandContext) => {
     return context.services.users.login(args);
-});
+}, [validate(loginValidator)]);
 
 export const requestTemporaryPassCode = makeCommand((args: RequestPassCodeArgs, context: ICommandContext) => {
     return context.services.users.requestTemporaryPassCode(args);
