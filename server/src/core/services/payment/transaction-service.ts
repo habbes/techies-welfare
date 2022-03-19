@@ -4,6 +4,7 @@ import { generateId } from "../../../util";
 import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
 import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
 import { createResourceNotFoundError, rethrowIfAppError, createDbError, isMongoDuplicateKeyError, createUniquenessFailedError } from "../../error";
+import { createUserPrincipal, getSystemPrincipal } from "../../auth";
 
 const COLLECTION = "transactions";
 
@@ -65,7 +66,7 @@ export class TransactionService implements ITransactionService {
             trxArgs.status = providerResult.status;
             trxArgs.metadata = providerResult.metadata;
 
-            const result = await this.create(trxArgs);
+            const result = await this.create(trxArgs, createUserPrincipal(user._id));
             return result;
         }
         catch (e) {
@@ -93,7 +94,7 @@ export class TransactionService implements ITransactionService {
             trxArgs.metadata = providerResult.metadata;
             trxArgs.metadata.recordedBy = recordedBy;
 
-            const result = await this.create(trxArgs);
+            const result = await this.create(trxArgs, recordedBy);
             return result;
         }
         catch (e) {
@@ -117,6 +118,7 @@ export class TransactionService implements ITransactionService {
                     failureReason: result.failureReason,
                     metadata: result.metadata,
                     updatedAt: now,
+                    updatedBy: getSystemPrincipal(),
                     amount: result.amount
                 }
             }, {
@@ -239,6 +241,7 @@ export class TransactionService implements ITransactionService {
                     failureReason: providerResult.failureReason,
                     metadata: providerResult.metadata,
                     updatedAt: new Date(),
+                    updatedBy: getSystemPrincipal(),
                     amount: providerResult.amount
                 }
             }, { returnDocument: 'after' });
@@ -247,7 +250,7 @@ export class TransactionService implements ITransactionService {
         return updatedRes.value;
     }
 
-    private async create(args: CreateTransactionArgs): Promise<ITransaction> {
+    private async create(args: CreateTransactionArgs, createdBy: IPrincipal): Promise<ITransaction> {
         const now = new Date();
         const tx: ITransaction = {
             _id: generateId(),
@@ -256,6 +259,8 @@ export class TransactionService implements ITransactionService {
             status: args.status || 'pending',
             createdAt: now,
             updatedAt: now,
+            createdBy: createdBy,
+            updatedBy: createdBy,
             metadata: args.metadata || {}
         };
 

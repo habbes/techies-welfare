@@ -15,7 +15,7 @@ export interface IUserService {
     initiatePayment(id: string, args: InitiatePaymentArgs): Promise<ITransaction>;
     getTransactions(id: string): Promise<ITransaction[]>;
     getAccountSummary(id: string): Promise<IUserAccountSummary>;
-    makeAdmin(id: string): Promise<IUser>;
+    makeAdmin(id: string, updatedBy: IPrincipal): Promise<IUser>;
     /**
      * Checks whether there are any users in the database.
      * This is only used to verify whether initial system

@@ -96,7 +96,7 @@ export const getUserAccountSummary = makeCommand((user: string, context: IComman
     [requireScopes('Transactions.Read.All', 'Users.Read.All'), validate(stringValidator)]);
 
 export const makeUserAdmin = makeCommand((user: string, context: ICommandContext) =>
-    context.services.users.makeAdmin(user),
+    context.services.users.makeAdmin(user, createUserPrincipal(context.authContext.user._id)),
     [requireScopes('Users.Write.All'), validate(stringValidator)]);
 
 export const getTransactions = makeCommand((_, context: ICommandContext) =>
