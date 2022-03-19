@@ -1,4 +1,5 @@
 import { Router } from "express";
+import Joi from "joi";
 import {
     createUser,
     getUsers,
@@ -43,8 +44,17 @@ router.post("/notify-users", requireAuth(), wrapResponse(req =>
 router.post("/preview-message", requireAuth(), wrapResponse(req => 
     req.commands.execute(previewMessage, req.body.message).then(message => ({ message }))));
 
-router.post("/users", requireAuth(), wrapResponse(req => 
-    req.commands.execute(createUser, req.body)));
+router.post("/users", requireAuth(), wrapResponse(req => {
+    // cast memberSince to a valid date otherwise validation will fail
+    // TODO maybe this should be done directly by the command validator?
+    const data = { ...req.body };
+    const { error, value } = Joi.date().validate(data.memberSince);
+    if (!error) {
+        data.memberSince = value;
+    }
+
+    return req.commands.execute(createUser, data)
+}));
 
 router.post("/users/:id/make-admin", requireAuth(), wrapResponse(req =>
     req.commands.execute(makeUserAdmin, req.params.id)));
@@ -73,8 +83,19 @@ router.get("/users/:id", requireAuth(), wrapResponse(req =>
 router.get("/users/:id/transactions", requireAuth(), wrapResponse(req =>
     req.commands.execute(getUserTransactions, req.params.id)));
 
-router.post("/transactions", wrapResponse(req =>
-    req.commands.execute(createManualTransaction, req.body)));
+router.post("/transactions", wrapResponse(req => {
+    // cast dates to avoid validation errors
+    // TODO maybe this should be done directly by the command validator?
+    const data = { ...req.body };
+    if (data.metadata) {
+        const { error, value } = Joi.date().validate(data.metadata.transactionDate);
+        if (!error) {
+            data.metadata.transactionDate = value;
+        }
+    }
+
+    return req.commands.execute(createManualTransaction, req.body)
+}));
 
 router.get("/transactions", wrapResponse(req => 
     req.commands.execute(getTransactions, undefined)));

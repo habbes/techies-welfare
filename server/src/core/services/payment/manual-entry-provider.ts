@@ -1,5 +1,5 @@
-import { generateId } from "../../../util";
-import { IUser, ITransaction, TransactionStatus } from "../../models";
+
+import { IUser, ITransaction } from "../../models";
 import { IPaymentHandler, PaymentRequestResult, ProviderTransactionInfo } from "./types";
 
 export const MANUAL_ENTRY_PAYMENT_PROVIDER_NAME = "manual_entry";

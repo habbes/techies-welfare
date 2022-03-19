@@ -191,7 +191,9 @@ export default defineComponent({
                 phone: phone.value,
                 email: email.value,
                 team: team.value,
-                joinedAt: new Date(memberSince.value)
+                memberSince: new Date(memberSince.value),
+                idNumber: idNumber.value,
+                nextOfKin: nextOfKin
             };
 
             try {

@@ -11,7 +11,7 @@ interface CreateUserArgs {
     email: string;
     name: string;
     phone: string;
-    joinedAt: Date;
+    memberSince: Date;
     team: string;
 }
 
