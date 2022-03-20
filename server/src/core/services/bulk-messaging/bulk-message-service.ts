@@ -1,14 +1,14 @@
 import { BatchJobQueue } from '../../../util';
 import { IUser } from "../../models";
-import { ISmsService } from '../sms';
 import { IUserService } from '../user';
-import { SmsMessageTransport } from './sms-transport';
 import { RecipientResolver } from './recipient-resolver';
 import { MessageTemplateResolver } from './template-resolver';
 import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver } from './types';
 import { getPreviewUser } from './preview-user';
 import { createAppError, createValidationError } from '../..';
 import { BulkMessageSendArgs } from '.';
+
+const DEFAULT_SUBJECT = "Techies Welfare Notification";
 
 export interface BulkMessageServiceArgs {
   contextFactory: IMessageContextFactory;
@@ -35,7 +35,7 @@ export class BulkMessageService implements IBulkMessageService {
         this.transport = args.transport;
     }
 
-    async send({ recipients, message }: BulkMessageSendArgs): Promise<BulkMessageReport> {
+    async send({ recipients, message, subject }: BulkMessageSendArgs): Promise<BulkMessageReport> {
         // validate recipients
         const invalidGroups = recipients.filter(group => !this.recipientResolver.canResolve(group));
         if (invalidGroups.length) {
@@ -50,7 +50,7 @@ export class BulkMessageService implements IBulkMessageService {
         };
 
         const allRecipients = await this.getRecipients(recipients, report);
-        await this.sendToRecipients(allRecipients, message, report);
+        await this.sendToRecipients(allRecipients, message, subject || DEFAULT_SUBJECT, report);
 
         return report;
     }
@@ -94,18 +94,19 @@ export class BulkMessageService implements IBulkMessageService {
         }
     }
 
-    private async sendToRecipients(recipients: IUser[], messageTemplate: string, report: BulkMessageReport): Promise<void> {
-        var queue = new BatchJobQueue<IUser>(recipient => this.sendToRecipient(recipient, messageTemplate, report));
+    private async sendToRecipients(recipients: IUser[], messageTemplate: string, subjectTemplate: string, report: BulkMessageReport): Promise<void> {
+        var queue = new BatchJobQueue<IUser>(recipient => this.sendToRecipient(recipient, messageTemplate, subjectTemplate, report));
 
         recipients.forEach(recipient => queue.push(recipient));
         queue.signalEof();
         await queue.run();
     }
 
-    private async sendToRecipient(recipient: IUser, template: string, report: BulkMessageReport): Promise<void> {
+    private async sendToRecipient(recipient: IUser, template: string, subjectTemplate: string, report: BulkMessageReport): Promise<void> {
         try {
         const message = await this.createMessageForUser(recipient, template);
-        await this.transport.sendMessage(recipient, message);
+        const subject = await this.createMessageForUser(recipient, subjectTemplate);
+        await this.transport.sendMessage(recipient, message, subject);
         report.numRecipients += 1;
         report.recipients.push({
             user: recipient._id,

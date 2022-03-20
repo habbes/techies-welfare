@@ -19,12 +19,13 @@ export interface IRecipientResolver {
 }
 
 export interface IMessageTransport {
-    sendMessage(recipient: IUser, message: string): Promise<void>;
+    sendMessage(recipient: IUser, message: string, subject: string): Promise<void>;
 }
 
 export interface BulkMessageSendArgs {
     recipients: string[];
     message: string;
+    subject?: string;
 }
 
 export interface BulkMessageReport {

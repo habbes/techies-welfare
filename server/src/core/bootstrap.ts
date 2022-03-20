@@ -13,8 +13,11 @@ import {
     SmsMessageTransport,
     TransactionService,
     UserService,
-    SystemService
+    SystemService,
+    combineMessageTransports,
+    EmailMessageTransport
 } from "./services";
+import { LocalEmailService, SendGridEmailService } from "./services/email";
 import { IAppServices } from "./types";
 
 export async function bootstrap(config: AppConfig): Promise<IAppServices> {
@@ -37,10 +40,17 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
     const settings = new AppSettingsService();
 
     const smsService = config.smsProvider === "at" ?
-    new AtSmsService({ apiKey: config.atApiKey, username: config.atUsername ,sender: config.atSmsSender }) :
-    new LocalSmsService();
+        new AtSmsService({ apiKey: config.atApiKey, username: config.atUsername, sender: config.atSmsSender }) :
+        new LocalSmsService();
 
-    const messageTransport = new SmsMessageTransport({ smsService });
+    const emailService = config.emailProvider === "sendgrid" ?
+        new SendGridEmailService({ apiKey: config.sendGridApiKey, sender: config.sendGridSender }) :
+        new LocalEmailService();
+
+    const messageTransport = combineMessageTransports(
+        new SmsMessageTransport({ smsService }),
+        new EmailMessageTransport({ emailService })
+    );
 
     const transactions = new TransactionService(db, { paymentHandlers });
     await transactions.createIndexes();

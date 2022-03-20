@@ -41,6 +41,18 @@ npm run build
 
 Will build the production assets and bundle and output them in the `dist` directory.
 
+## Configuration
+
+You can create an `.env` file and store some config variables, or set environment variables.
+These variables can be used to build the app with production-specific values. For example
+
+`VITE_API_URL` should be set to the API root endpoint, e.g.: `https://toleo-api.example.com/api`.
+
+`VITE_BASE_URL` should be set to the base URL of the web app, e.g. : `https://toleo.example.com`.
+
+The env variables start with `VITE_`
+[so that they can be processed by the `vite` build tool](https://vitejs.dev/guide/env-and-mode.html#env-files).
+
 ## Code organization
 
 - The [src](./src) directory contains most of the source code. Therein you'll find more docs about the code architecture and organization.
