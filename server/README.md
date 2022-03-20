@@ -90,7 +90,22 @@ For example, if you server is hosted at `https://toleo.example.com` and you set 
 
 The app assumes that Flutterwave will apply transaction charges on top of the amount paid by the user (as opposed to deducting from the amount entered by the user). To achieve this behaviour, you must tell Flutterwave that the end user will bear the transaction costs. In your Flutterwave dashboard go to: **Settings** -> **Account Settings** -> **Make customers pay the transaction fees**
 
-### Configuration
+### Running the worker for scheduled reminders
+
+The app can send scheduled personal reports and contribution reminders to all users. To start the work, run:
+```
+npm run worker
+```
+
+By default, the reminders will be sent every month (1st of every month at 10AM EAT). You can change the schedule
+by setting the `MONTHLY_REMINDER_SCHEDULE` environment variable or `.env` file using [Cron syntax](https://github.com/kelektiv/node-cron#available-cron-patterns).
+
+For example, to schedule a reminder every minute:
+```
+MONTHLY_REMINDER_SCHEDULE="0 * * * * *"
+```
+
+### Other Configuration
 
 The server uses a bunch of config variables which are retrieved from environment variables. These includes things like server port, MongoDB address, API Keys, web app base URL, etc.
 

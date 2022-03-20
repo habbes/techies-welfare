@@ -56,6 +56,11 @@ export interface AppConfig {
      * Root path for flutterwave webhooks
      */
     flutterwaveWebhooksRoot: string;
+    /**
+     * Interval delay in CronTime format that
+     * determines when monthly reminders are scheduled
+     */
+    monthlyReminderSchedule: string;
 };
 
 
@@ -76,5 +81,6 @@ export function loadAppConfigFrom(env: Record<string, string>): AppConfig {
         flutterwaveRedirectUrl: `${webAppBaseUrl}/post-payment/flutterwave`,
         flutterwaveSecretKey: env.FLUTTERWAVE_SECRET_KEY || "",
         flutterwaveWebhooksRoot: env.FLUTTERWAVE_WEBHOOKS || "/webhooks/flutterwave",
+        monthlyReminderSchedule: env.MONTHLY_REMINDER_SCHEDULE || `0 0 10 1 * *`, // 1st of each month at 10am
     }
 }

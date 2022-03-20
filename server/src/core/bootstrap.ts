@@ -2,6 +2,7 @@ import { MongoClient } from "mongodb";
 import { AppConfig } from "./config";
 import {
     AtSmsService,
+    AppSettingsService,
     BulkMessageService,
     FlutterwavePaymentProvider,
     LinkGeneratorService,
@@ -14,7 +15,6 @@ import {
     UserService,
     SystemService
 } from "./services";
-import { AppSettingsService } from "./services/settings/app-settings-service";
 import { IAppServices } from "./types";
 
 export async function bootstrap(config: AppConfig): Promise<IAppServices> {
@@ -67,7 +67,8 @@ export async function bootstrap(config: AppConfig): Promise<IAppServices> {
         users,
         transactions,
         bulkMessages,
-        system
+        system,
+        settings
     };
 }
 

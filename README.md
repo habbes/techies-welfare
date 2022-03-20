@@ -27,7 +27,7 @@ in the [webapp](./webapp) directory.
 - [x] Allow admin to view transactions
 - [x] Allow admin to view details of a particular transaction
 - [x] Allow admin to record transactions manually
-- [ ] Automatically send monthly report to all users
+- [x] Automatically send monthly report to all users
 - [x] Authentication
 - [x] User roles and permissions
 - [x] Data validation
