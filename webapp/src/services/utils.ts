@@ -33,3 +33,8 @@ export function getRoleDisplayName(role: string) {
             return role;
     }
 }
+
+export function getDateTimeString(date: Date | string) {
+    const convertedDate = typeof date === 'string' ? new Date(date) : date;
+    return `${convertedDate.toLocaleDateString()} ${convertedDate.toLocaleTimeString()}`;
+}

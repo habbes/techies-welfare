@@ -38,7 +38,7 @@
                 <UiH3>Payments</UiH3>
                 <UiButton class="mb-5" @click="openAddPaymentPane">Add payment</UiButton>
             </UiLayout>
-            <TransactionsTable :transactions="transactions" />
+            <TransactionsTable :transactions="transactions" :getTransactionRoute="getTransactionRoute"/>
         </UiLayout>
         <UiDialog ref="makeAdminDialog" v-if="user" title="Promote user to admin">
             <UiLayout vertical smallGap>
@@ -59,7 +59,7 @@
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { showError, showSuccess } from "../../../toasts";
-import { getRoleDisplayName, isUserAdmin } from "../../../services";
+import { getRoleDisplayName, isUserAdmin, ITransaction } from "../../../services";
 import { apiClient } from "../../../api-client";
 import AddPayment from "./add-payment.vue";
 import TransactionsTable from "../../../components/transactions-table.vue";
@@ -103,7 +103,7 @@ export default defineComponent({
         UiGridLayout },
     setup() {
         const user = ref();
-        const transactions = ref([]);
+        const transactions = ref<ITransaction[]>([]);
         const isAddPaymentPaneOpen = ref(false);
         const addPaymentPane = ref();
         const makeAdminDialog = ref<typeof UiDialog>();
@@ -115,7 +115,7 @@ export default defineComponent({
                 user.value = await apiClient.getUserById(userId);
                 transactions.value = await apiClient.getUserTransactions(userId);
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         });
@@ -143,6 +143,10 @@ export default defineComponent({
             return arrears;
         });
 
+        function getTransactionRoute(trx: ITransaction) {
+            return { name: 'admin-payment-details', params: { id: trx._id } };
+        }
+
         function openAddPaymentPane() {
             isAddPaymentPaneOpen.value = true;
         }
@@ -151,7 +155,7 @@ export default defineComponent({
             isAddPaymentPaneOpen.value = false;
         }
 
-        function onAddPayment(trx) {
+        function onAddPayment(trx: ITransaction) {
             transactions.value?.unshift(trx);
             closeAddPaymentPane();
         }
@@ -166,7 +170,7 @@ export default defineComponent({
                 makeAdminDialog.value?.close();
                 showSuccess(`Successfully promoted ${user.value.name} to admin.`);
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         }
@@ -191,7 +195,8 @@ export default defineComponent({
             makeAdminDialog,
             openMakeAdminDialog,
             cancelMakeAdmin,
-            makeAdmin
+            makeAdmin,
+            getTransactionRoute
         }
     },
 })

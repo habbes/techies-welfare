@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IAuthService } from "./auth";
+import { ITransaction } from "./types";
 
 interface InitiatePaymentArgs {
     userId: string;
@@ -132,8 +133,12 @@ export class ApiClient {
         return getData(this.httpClient.get('/transactions'));
     }
 
-    getTransactionByProviderId(provider: string, providerId: string) {
-        return getData(this.httpClient.get(`/transactions/provider/${provider}/${providerId}`));
+    getTransactionByProviderId(provider: string, providerTransactionId: string) {
+        return getData(this.httpClient.get(`/transactions/provider/${provider}/${providerTransactionId}`));
+    }
+
+    getTransactionById(id: string) {
+        return getData<ITransaction>(this.httpClient.get(`/transactions/${id}`));
     }
 
     initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
