@@ -79,6 +79,12 @@ To learn more about all the different available config options, check the [src/c
 
 If you update your `.env` file, you need to re-run the server for the changes to take effect.
 
+### Database
+
+Use `DB_URL` and `DB_NAME` to configure the database.
+
+By default it connects to a `mongodb://localhost:27017` and uses `techies_welfare` as db name.
+
 ### Web app base URL
 
 The server needs to know the app's base URL in order for payment links and post-payment redirection to work properly. The **base URL should be the url where the frontend web app is hosted**. By default this is `http://localhost:3000` during development.
