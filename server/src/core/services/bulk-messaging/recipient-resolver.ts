@@ -9,10 +9,10 @@ export interface RecipientResolverArgs {
 }
 
 export class RecipientResolver implements IRecipientResolver {
-    private innerResolver: CombinedRecipientResolver;
+    private innerResolver: IRecipientResolver;
 
     constructor(args: RecipientResolverArgs) {
-        this.innerResolver = new CombinedRecipientResolver(
+        this.innerResolver = combinedRecipientResolvers(
             new AllGroupRecipientResolver(args.users),
             new PhoneRecipientResolver(args.users)
         );
@@ -27,22 +27,18 @@ export class RecipientResolver implements IRecipientResolver {
     }
 }
 
-export class CombinedRecipientResolver implements IRecipientResolver {
-    private resolvers: IRecipientResolver[];
-  
-    constructor(...resolvers: IRecipientResolver[]) {
-      this.resolvers = resolvers;
-    }
-  
-    canResolve(recipient: string): boolean {
-      return this.resolvers.some(resolver => resolver.canResolve(recipient));
-    }
-    
-    resolve(recipient: string): Promise<IUser[]> {
-      const resolver = this.resolvers.find(candidate => candidate.canResolve(recipient));
-      if (!resolver) throw new Error(`Recipient resolver not found for recipient ${resolver}`);
-  
-      return resolver.resolve(recipient);
+export function combinedRecipientResolvers(...resolvers: IRecipientResolver[]): IRecipientResolver {
+    return {
+        canResolve(recipient: string): boolean {
+            return resolvers.some(resolver => resolver.canResolve(recipient));
+        },
+
+        resolve(recipient: string): Promise<IUser[]> {
+            const resolver = resolvers.find(candidate => candidate.canResolve(recipient));
+            if (!resolver) throw new Error(`Recipient resolver not found for recipient ${resolver}`);
+        
+            return resolver.resolve(recipient);
+        }
     }
   }
   

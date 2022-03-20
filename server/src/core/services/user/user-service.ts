@@ -240,7 +240,7 @@ export class UserService implements IUserService {
 
             const safeUser = getSafeUser(user);
 
-            await this.messageTransport.sendMessage(safeUser, `Toleo Pass Code: ${passCode}`);
+            await this.messageTransport.sendMessage(safeUser, `Toleo Pass Code: ${passCode}`, 'Toleo One-Time Pass Code');
         }
         catch (e) {
             rethrowIfAppError(e);

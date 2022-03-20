@@ -1,4 +1,5 @@
 type SmsProvider = "local" | "at";
+type EmailProvider = "local" | "sendgrid";
 
 export interface AppConfig {
     /**
@@ -41,6 +42,18 @@ export interface AppConfig {
      */
     atWebhooksRoot: string;
     /**
+     * The email provider to use for sending emails
+     */
+    emailProvider: EmailProvider;
+    /**
+     * SendGrid API key
+     */
+     sendGridApiKey: string;
+     /**
+      * SendGrid email sender
+      */
+     sendGridSender: string;
+    /**
      * Flutterwave's API secret key
      */
     flutterwaveSecretKey: string;
@@ -77,6 +90,9 @@ export function loadAppConfigFrom(env: Record<string, string>): AppConfig {
         atUsername: env.AT_USERNAME || "sandbox",
         atWebhooksRoot: env.AT_WEBHOOKS || "/webhooks/at",
         atSmsSender: env.AT_SMS_SENDER || "",
+        emailProvider: (env.EMAIL_PROVIDER as EmailProvider) || "local",
+        sendGridApiKey: env.SENDGRID_API_KEY || "",
+        sendGridSender: env.SENDGRID_SENDER || "",
         flutterwaveLogoUrl: `${webAppBaseUrl}/img/logo.png`,
         flutterwaveRedirectUrl: `${webAppBaseUrl}/post-payment/flutterwave`,
         flutterwaveSecretKey: env.FLUTTERWAVE_SECRET_KEY || "",

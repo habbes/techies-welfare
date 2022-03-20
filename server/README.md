@@ -63,9 +63,33 @@ The command will fail if the project already has registered users.
 
 Currently, the server is not set-up to auto-rebuild when code changes occur. So when you want to test your changes, you'll need to manually terminate the server and rebuild and re-run it: `npm run build && npm run start`
 
-### Mock SMS-based authentication
+### Mock OTP-based authentication
 
-If you have not configured Africa's Talking as the SMS gateway (see [Configuration](#configuration)), a mock SMS gateway will be used which simply logs SMS messages on the console. When logging in, check the terminal where the server is running to see the generated OTP pass code.
+The app currently sends one-time pass codes via SMS and Email for authentication (instead of passwords, for convenience).
+
+If you have not configured Africa's Talking for SMS or SendGrid for Email (see [Configuration](#configuration)), a mock SMS gateway will be used which simply logs SMS messages on the console. When logging in, check the terminal where the server is running to see the generated OTP pass code.
+
+## Configuration
+
+The server uses a bunch of config variables which are retrieved from environment variables. These includes things like server port, MongoDB address, API Keys, web app base URL, etc.
+
+You can override the defaults by creating a `.env` file in the `server` root directory and populating the file with the relevant variable-value pairs. Check out the [`env.example`](./env.example) file to see an example of what the file is supposed to look like.
+
+To learn more about all the different available config options, check the [src/core/config.ts](./src/core/config.ts) source file. Specifically, the `loadAppConfigFromEnv` functions shows which environment variable keys are used to retrieve which values.
+
+If you update your `.env` file, you need to re-run the server for the changes to take effect.
+
+### Database
+
+Use `DB_URL` and `DB_NAME` to configure the database.
+
+By default it connects to a `mongodb://localhost:27017` and uses `techies_welfare` as db name.
+
+### Web app base URL
+
+The server needs to know the app's base URL in order for payment links and post-payment redirection to work properly. The **base URL should be the url where the frontend web app is hosted**. By default this is `http://localhost:3000` during development.
+
+When you deploy to production or staging, you should set the `WEB_APP_BASE_URL` env variable to match the root url of the frontend, e.g. `https://toleo-app.example.com`.
 
 ### Configuring Flutterwave integration
 
@@ -105,15 +129,14 @@ For example, to schedule a reminder every minute:
 MONTHLY_REMINDER_SCHEDULE="0 * * * * *"
 ```
 
-### Other Configuration
+### Email and SMS
 
-The server uses a bunch of config variables which are retrieved from environment variables. These includes things like server port, MongoDB address, API Keys, web app base URL, etc.
+By default, the app uses "local" SMS and Email providers which simply log messages on the console. On production you should configure Africa's Talking for SMS and SendGrid for email.
 
-You can override the defaults by creating a `.env` file in the `server` root directory and populating the file with the relevant variable-value pairs. Check out the [`env.example`](./env.example) file to see a sample of what the file is supposed to look like.
+Use the `AT_API_KEY`, `AT_USERNAME` and `AT_SENDER` env variables to integrate Africa's Talking. Then set `SMS_PROVIDER` to `at`.
 
-To learn more about all the different available config options, check the [src/core/config.ts](./src/core/config.ts) source file. Specifically, the `loadAppConfigFromEnv` functions shows which environment variable keys are used to retrieve which values.
+Use the `SENDGRID_API_KEY` and `SENDGRID_SENDER` env variables to integrate SendGrid's API. Then set `EMAIL_PROVIDER` to `sendgrid`.
 
-If you update your `.env` file, you need to re-run the server for the changes to take effect.
 
 ## Code architecture and organization
 
