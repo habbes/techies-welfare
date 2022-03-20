@@ -86,6 +86,13 @@ export interface ITransaction<ProviderMetadata = any> extends HasId, HasCreatorU
     failureReason?: string;
 }
 
+export interface ITransactionWithUserData<ProviderMetadata = any> extends ITransaction<ProviderMetadata> {
+    fromUserData: {
+        _id: string;
+        name: string;
+    }
+}
+
 export type TransactionStatus = 'pending' | 'failed' | 'success';
 export type TransactionType = 'contribution';
 

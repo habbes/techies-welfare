@@ -41,12 +41,10 @@
 
                 <UiLayout vertical tinyGap>
                     <UiText bold>Paid by</UiText>
-                    <UiLink :to="{ name: 'admin-member-details', params: { id: transaction.fromUser } }">
-                        {{ transaction.fromUser }}
-                    </UiLink>
+                    <UserLink :user="transaction.fromUserData"/>
                 </UiLayout>
 
-                <UiLayout vertical tinyGap>
+                <UiLayout vertical tinyGap v-if="transactionDate">
                     <UiText bold>Transaction date</UiText>
                     <UiText>{{ getDateTimeString(transactionDate) }}</UiText>
                 </UiLayout>
@@ -66,11 +64,9 @@
                     <UiText>{{ getDateTimeString(transaction.updatedAt) }}</UiText>
                 </UiLayout>
 
-                <UiLayout v-if="transaction.provider === 'manual_entry'" vertical tinyGap>
+                <UiLayout v-if="transaction.provider === 'manual_entry' && recordedBy" vertical tinyGap>
                     <UiText bold>Recorded by</UiText>
-                    <UiLink :to="{ name: 'admin-member-details', params: { id: transaction.metadata.recordedBy._id } }">
-                        {{ transaction.metadata.recordedBy._id }}
-                    </UiLink>
+                    <UserLink :user="recordedBy" />
                 </UiLayout>
 
                 <UiLayout v-if="transaction.provider === 'manual_entry'" vertical tinyGap>
@@ -92,8 +88,8 @@ import { useRoute } from 'vue-router';
 import { apiClient } from '../../../api-client';
 // TODO: import type is a workaround for this issue: https://github.com/vuejs/core/issues/3183
 // may be fixed in a later version, revisit this after upgrading vue.js
-import type { ITransaction } from '../../../services';
-import { getDateTimeString } from "../../../services";
+import type { ITransaction, IUser } from '../../../services';
+import { getTransactionDate, getDateTimeString, getPaymentProviderDisplayName } from "../../../services";
 import { showError } from '../../../toasts';
 import {
     UiLayout,
@@ -102,14 +98,15 @@ import {
     UiText,
     UiLink,
 } from "../../../ui-components";
+import UserLink from "../../../components/user-link.vue";
 
 const transaction = ref<ITransaction>();
+const recordedBy = ref<IUser>();
 const route = useRoute();
 
 const providerName = computed(() =>
-    transaction.value?.provider === 'flutterwave' ? 'Flutterwave':
-        transaction.value?.provider === "manual_entry" ? 'Manual Entry':
-        transaction.value?.provider)
+    transaction.value ?
+        getPaymentProviderDisplayName(transaction.value.provider) : null);
 
 const title = computed(() =>
     transaction.value ?
@@ -117,16 +114,16 @@ const title = computed(() =>
         : '');
 
 const transactionDate = computed(() =>
-    transaction.value?.provider === 'manual_entry' ?
-        transaction.value?.metadata.transactionDate
-        : transaction.value?.provider === 'flutterwave' && transaction.value?.status === 'success' ?
-        transaction.value?.metadata.created_at
-        : transaction.value?.createdAt);
+    transaction.value? getTransactionDate(transaction.value) : null);
 
 onMounted(async () => {
     try {
         const txId = route.params.id as string;
         transaction.value = await apiClient.getTransactionById(txId);
+        if (transaction.value.provider === 'manual_entry') {
+            recordedBy.value = await apiClient
+                .getUserById(transaction.value.metadata.recordedBy._id);
+        }
     }
     catch (e: any) {
         showError(e.message);

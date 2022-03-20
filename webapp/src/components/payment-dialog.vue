@@ -1,22 +1,22 @@
 <template>
     <UiDialog ref="dialog" title="Make contribution">
-        <form @submit.prevent="initiatePayment">
-            <UiTextInput required type="number" full v-model="amount" />
+        <UiForm @submit="initiatePayment">
+            <UiNumberInput required type="number" full v-model="amount" />
             <UiLayout class="mt-3 gap-3">
                 <UiButton primary submit>Proceed to pay</UiButton>
                 <UiButton @click="close" secondary>Cancel</UiButton>
             </UiLayout>
-        </form>
+        </UiForm>
     </UiDialog>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { UiDialog, UiTextInput, UiLayout, UiButton } from "../ui-components";
+import { UiDialog, UiNumberInput, UiLayout, UiButton, UiForm } from "../ui-components";
 import { apiClient } from "../api-client";
 import { showError } from "../toasts";
 
 export default defineComponent({
-    components: { UiDialog, UiTextInput, UiLayout, UiButton },
+    components: { UiDialog, UiNumberInput, UiLayout, UiButton, UiForm },
     props: {
         defaultAmount: Number,
     },
@@ -34,7 +34,7 @@ export default defineComponent({
         }
 
         function resetForm() {
-            amount.value = props.defaultAmount;
+            amount.value = props.defaultAmount ?? 1000;
         }
 
         async function initiatePayment() {
@@ -44,7 +44,7 @@ export default defineComponent({
                     window.location = trx.metadata.paymentUrl;
                 }
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         }

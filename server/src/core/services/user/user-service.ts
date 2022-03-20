@@ -345,7 +345,7 @@ export class UserService implements IUserService {
     }
 
     getTransactions(id: string): Promise<ITransaction[]> {
-        return this.transactions.getAllByUser(id);
+        return this.transactions.get({ fromUser: id });
     }
 
     async getAccountSummary(id: string): Promise<IUserAccountSummary> {

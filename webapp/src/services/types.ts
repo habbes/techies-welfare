@@ -25,4 +25,8 @@ export interface ITransaction extends HasId, HasTimestamps {
     type: TransactionType;
     fromUser: string;
     failureReason?: string;
+    fromUserData: {
+        _id: string;
+        name: string;
+    }
 }

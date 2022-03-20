@@ -1,4 +1,5 @@
 import { IUser } from ".";
+import { ITransaction } from "./types";
 
 /**
  * Returns the highest role of the
@@ -37,4 +38,27 @@ export function getRoleDisplayName(role: string) {
 export function getDateTimeString(date: Date | string) {
     const convertedDate = typeof date === 'string' ? new Date(date) : date;
     return `${convertedDate.toLocaleDateString()} ${convertedDate.toLocaleTimeString()}`;
+}
+
+export function getPaymentProviderDisplayName(provider: string) {
+    switch (provider) {
+        case 'manual_entry':
+            return 'Manuel entry';
+        case 'flutterwave':
+            return 'Flutterwave';
+        default:
+            return provider;
+    }
+}
+
+export function getTransactionDate(transaction: ITransaction): Date {
+    if (transaction.provider === 'manual_entry') {
+        return new Date(transaction.metadata.recordedAt);
+    }
+
+    if (transaction.provider === 'flutterwave' && transaction.status === 'success') {
+        return new Date(transaction.metadata.created_at);
+    }
+
+    return new Date(transaction.createdAt);
 }

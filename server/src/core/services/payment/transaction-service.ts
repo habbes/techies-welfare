@@ -1,7 +1,7 @@
 import { Collection, Db } from "mongodb";
-import { IPrincipal, ITransaction, IUser, TransactionStatus } from "../../models";
+import { IPrincipal, ITransaction, ITransactionWithUserData, IUser, TransactionStatus } from "../../models";
 import { generateId } from "../../../util";
-import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs } from "./types";
+import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, CreateTransactionArgs, ITransactionFilter } from "./types";
 import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
 import { createResourceNotFoundError, rethrowIfAppError, createDbError, isMongoDuplicateKeyError, createUniquenessFailedError } from "../../error";
 import { createUserPrincipal, getSystemPrincipal } from "../../auth";
@@ -161,9 +161,73 @@ export class TransactionService implements ITransactionService {
         }
     }
 
-    async getAllByUser(userId: string): Promise<ITransaction<any>[]> {
+    getAllByUser(userId: string): Promise<ITransactionWithUserData<any>[]> {
+        return this.get({ fromUser: userId });
+    }
+
+    async get(rawFilter: ITransactionFilter): Promise<ITransactionWithUserData[]> {
+        const filter: Partial<ITransaction> = {};
+
+        if (rawFilter.fromUser) {
+            filter.fromUser = rawFilter.fromUser;
+        }
+
+        if (rawFilter.id) {
+            filter._id = rawFilter.id;
+        }
+
+        if (rawFilter.provider) {
+            filter.provider = rawFilter.provider;
+        }
+
+        if (rawFilter.providerTransactionId) {
+            filter.providerTransactionId = rawFilter.providerTransactionId;
+        }
+
+        const pipeline:  object[] = [
+            {
+                $match: filter
+            },
+            {
+                // this will add an array `fromUserDataRaw`
+                // containing all the data of the paying user
+                $lookup: {
+                    from: 'users',
+                    localField: 'fromUser',
+                    foreignField: '_id',
+                    as: 'fromUserDataRaw'
+                }
+            },
+            {
+                // we extract only the fields we care about from
+                // the first (and only) item in the `fromUserDataRaw` array
+                // into the `fromUserData` object
+                $addFields: {
+                    // `$fromUserDataRaw._id` will return the ids of all objects in the array
+                    // so we just take the first id, same for the name
+                    'fromUserData._id': { $arrayElemAt: ['$fromUserDataRaw._id', 0] },
+                    'fromUserData.name': { $arrayElemAt: ['$fromUserDataRaw.name', 0] }
+                }
+            },
+            {
+                $project: { fromUserDataRaw: 0 }
+            }
+        ];
+
+        if (filter._id || filter.providerTransactionId) {
+            // if ID was specified, the we only expect a single result
+            // and don't need to sort
+            pipeline.push({ $limit: 1 });
+        }
+        else {
+            pipeline.push({ $sort: { createdAt: -1 } });
+        }
+
         try {
-            const result = await this.collection.find({ fromUser: userId }).sort({ createdAt: -1 }).toArray();
+            const result = await this.collection
+            .aggregate<ITransactionWithUserData>(pipeline)
+            .toArray();
+
             return result;
         }
         catch (e) {
@@ -172,61 +236,44 @@ export class TransactionService implements ITransactionService {
         }
     }
 
-    async getAll(): Promise<ITransaction[]> {
-        try {
-            const result = await this.collection.find({}).sort({ createdAt: -1 }).toArray();
-            return result;
-        }
-        catch (e) {
-            rethrowIfAppError(e);
-            throw createDbError(e);
-        }
+    getById(transactionId: string): Promise<ITransactionWithUserData<any>> {
+        return this.getSingle({ id: transactionId });
     }
 
-    async getById(transactionId: string): Promise<ITransaction<any>> {
-        try {
-            const trx = await this.collection.findOne({ _id: transactionId });
-            if (!trx) throw createResourceNotFoundError('Transaction not found');
-
-            const updated = await this.updateTransactionStatus(trx);
-            return updated;
-        }
-        catch (e) {
-            rethrowIfAppError(e);
-            throw createDbError(e);
-        }
+    getByUserAndId(userId: string, transactionId: string): Promise<ITransactionWithUserData<any>> {
+        return this.getSingle({ id: transactionId, fromUser: userId });
     }
 
-    async getByUserAndId(userId: string, transactionId: string): Promise<ITransaction<any>> {
-        try {
-            const trx = await this.collection.findOne({ _id: transactionId, fromUser: userId });
-            if (!trx) throw createResourceNotFoundError('Transaction not found');
-
-            const updated = await this.updateTransactionStatus(trx);
-
-            return updated;
-        }
-        catch (e) {
-            rethrowIfAppError(e);
-            throw createDbError(e);
-        }
+    getByProviderId(provider: string, providerTransactionId: string): Promise<ITransactionWithUserData> {
+        return this.getSingle({ provider, providerTransactionId });
     }
 
-    async getByProviderId(provider: string, transactionId: string): Promise<ITransaction> {
-        try {
-            const trx = await this.collection.findOne({ provider, providerTransactionId: transactionId });
-            if (!trx) throw createResourceNotFoundError('Transaction not found');
-
-            const updated = await this.updateTransactionStatus(trx);
-
-            return updated;
+    /**
+     * retrieves a single transaction and attempts to updated
+     * its status if it's still pending
+     * @param filter 
+     */
+     private async getSingle(filter: ITransactionFilter): Promise<ITransactionWithUserData> {
+        const [trx] = await this.get(filter);
+        if (!trx) {
+            throw createResourceNotFoundError("Transaction not found");
         }
-        catch (e) {
-            rethrowIfAppError(e);
-            throw createDbError(e);
-        }
+
+        const updated = await this.updateTransactionStatus(trx);
+        // merge the two so we can combine the updated fields
+        // with the trx data that's not in the updated version
+        return {
+            ...trx,
+            ...updated
+        };
     }
 
+    /**
+     * Attempts to update the transaction status if it's still pending.
+     * The transaction will be considered updated by the system.
+     * @param trx 
+     * @returns 
+     */
     private async updateTransactionStatus(trx: ITransaction): Promise<ITransaction> {
         if (isFinalStatus(trx.status)) {
             return trx;

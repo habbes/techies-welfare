@@ -99,7 +99,7 @@ export default defineComponent({
                 await apiClient.requestOtp({ login: login.value });
                 state.value = 'enterOtp';
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         }
@@ -109,7 +109,7 @@ export default defineComponent({
                 await apiClient.requestOtp({ login: login.value });
                 showInfo("Passcode has been resent.")
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         }
@@ -136,7 +136,7 @@ export default defineComponent({
 
                 reset();
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         }
