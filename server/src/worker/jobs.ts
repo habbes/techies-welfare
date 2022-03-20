@@ -9,6 +9,7 @@ export async function broadcastContributionReminder(app: IAppServices) {
         const settings = await app.settings.getAppSettings();
         await app.bulkMessages.send({
             recipients: ['all'],
+            subject: "Techies Welfare Reminder",
             message: settings.monthlyReminderMessage
         });
     }

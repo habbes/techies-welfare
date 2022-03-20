@@ -20,7 +20,8 @@ import {
     initiatePaymentValidator,
     previewMessageValidator,
     InitiatePaymentForUserArgs,
-    initiateTransactionForUserValidator
+    initiateTransactionForUserValidator,
+    BulkMessagePreviewArgs
 } from "../services";
 import { createUserPrincipal } from "..";
 import { stringValidator } from "../../util";
@@ -32,9 +33,9 @@ export const runSetup = makeCommand((args: RunSetupArgs, context: ICommandContex
     context.services.system.runSetup(args),
     [validate(runSetupValidator)]);
 
-export const previewMessage = makeCommand<string, string, ICommandContext>((message, context) => {
-    return context.services.bulkMessages.previewMessage(message);
-}, [requireScopes('Messages.Preview'), validate(stringValidator)]);
+export const previewMessage = makeCommand((args: BulkMessagePreviewArgs, context: ICommandContext) => {
+    return context.services.bulkMessages.previewMessage(args);
+}, [requireScopes('Messages.Preview'), validate(previewMessageValidator)]);
 
 export const notifyUsers = makeCommand<BulkMessageSendArgs, BulkMessageReport, ICommandContext>((args, context) => {
     return context.services.bulkMessages.send(args);

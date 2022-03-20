@@ -15,6 +15,7 @@
                         keyword
                         to target all members.
                     </UiTextBlock>
+                    <UiTextInput v-model="subject" label="Subject" />
                     <UiTextArea
                         label="Message"
                         required
@@ -35,7 +36,7 @@
                 </UiLayout>
             </UiForm>
         </UiCard>
-        <MessageDialog ref="messageDialog" :message="message" :recipients="recipients"/>
+        <MessageDialog ref="messageDialog" :message="message" :recipients="recipients" :subject="subject" />
     </UiLayout>
 </template>
 <script lang="ts">
@@ -69,6 +70,7 @@ export default defineComponent({
     setup() {
         const messageDialog = ref();
         const recipientsText = ref('');
+        const subject = ref('');
         const message = ref('');
 
         const recipients = computed(() => {
@@ -82,6 +84,7 @@ export default defineComponent({
         return {
             message,
             recipientsText,
+            subject,
             recipients,
             messageDialog,
             sendMessage,

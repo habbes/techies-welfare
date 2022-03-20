@@ -43,7 +43,7 @@ router.post("/notify-users", requireAuth(), wrapResponse(req =>
     req.commands.execute(notifyUsers, req.body)));
 
 router.post("/preview-message", requireAuth(), wrapResponse(req => 
-    req.commands.execute(previewMessage, req.body.message).then(message => ({ message }))));
+    req.commands.execute(previewMessage, req.body)));
 
 router.post("/users", requireAuth(), wrapResponse(req => {
     // cast memberSince to a valid date otherwise validation will fail

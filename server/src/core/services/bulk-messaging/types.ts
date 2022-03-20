@@ -2,7 +2,7 @@ import { IUser } from "../../models";
 
 export interface IBulkMessageService {
     send(args: BulkMessageSendArgs): Promise<BulkMessageReport>;
-    previewMessage(messageTemplate: string): Promise<string>;
+    previewMessage(args: BulkMessagePreviewArgs): Promise<BulkMessagePreviewResult>;
 }
 
 export interface IMessageContextFactory {
@@ -26,6 +26,16 @@ export interface BulkMessageSendArgs {
     recipients: string[];
     message: string;
     subject?: string;
+}
+
+export interface BulkMessagePreviewArgs {
+    message: string;
+    subject?: string;
+}
+
+export interface BulkMessagePreviewResult {
+    message: string;
+    subject: string;
 }
 
 export interface BulkMessageReport {

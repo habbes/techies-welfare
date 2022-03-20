@@ -35,11 +35,18 @@ interface LoginResult {
 
 interface PreviewMessageArgs {
     message: string;
+    subject?: string;
+}
+
+export interface PreviewMessageResult {
+    message: string;
+    subject: string;
 }
 
 interface SendMessageArgs {
     recipients: string[];
     message: string;
+    subject?: string;
 }
 
 export interface ManualEntryTransactionArgs {
@@ -154,7 +161,7 @@ export class ApiClient {
     }
 
     previewMessage(args: PreviewMessageArgs) {
-        return getData(this.httpClient.post('/preview-message', args));
+        return getData<PreviewMessageResult>(this.httpClient.post('/preview-message', args));
     }
 
     sendMessage(args: SendMessageArgs) {

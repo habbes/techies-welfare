@@ -8,8 +8,9 @@
                 Here's a preview of the message that will be sent to the following recipients:
                 <UiText monospace v-for="recipient in recipients" :key="recipient">{{ recipient }}, </UiText>
             </UiTextBlock>
+            <UiText bold v-if="preview">{{ preview.subject }}</UiText>
             <UiCodeBlock v-if="preview">
-                {{ preview }}
+                {{ preview.message }}
             </UiCodeBlock>
             <UiLayout smallGap>
                 <UiButton @click="sendMessage">Proceed to send message</UiButton>
@@ -19,7 +20,8 @@
     </UiDialog>
 </template>
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, PropType } from 'vue'
+import { defineComponent, ref, PropType } from 'vue'
+import { PreviewMessageResult } from "../../services";
 import { apiClient } from '../../api-client';
 import { showError, showInfo } from "../../toasts";
 import {
@@ -41,11 +43,18 @@ export default defineComponent({
         UiButton
     },
     props: {
-        message: String,
-        recipients: Array as PropType<string[]>,
+        message: {
+            type: String,
+            required: true
+        },
+        subject: String,
+        recipients: {
+            type: Array as PropType<string[]>,
+            required: true
+        }
     },
     setup(props) {
-        const preview = ref('');
+        const preview = ref<PreviewMessageResult>();
         const dialog = ref();
         const loadingPreview = ref(false);
 
@@ -61,10 +70,12 @@ export default defineComponent({
             if (props.message) {
                 loadingPreview.value = true;
                 try {
-                    const res = await apiClient.previewMessage({ message: props.message });
-                    preview.value = res.message;
+                    preview.value = await apiClient.previewMessage({
+                        message: props.message,
+                        subject: props.subject
+                    });
                 }
-                catch (e) {
+                catch (e: any) {
                     showError(e.message);
                 }
                 loadingPreview.value = false;
@@ -73,11 +84,14 @@ export default defineComponent({
 
         async function sendMessage() {
             try {
-                const report = await apiClient.sendMessage({ message: props.message, recipients: props.recipients });
+                const report = await apiClient.sendMessage({
+                    message: props.message,
+                    recipients: props.recipients,
+                    subject: props.subject });
                 close();
                 showInfo(`Message sent.\nNumber of recipients: ${report.numRecipients}\nMessages failed: ${report.numFailed}`);
             }
-            catch (e) {
+            catch (e: any) {
                 showError(e.message);
             }
         }
@@ -88,7 +102,8 @@ export default defineComponent({
             dialog,
             preview,
             getPreview,
-            sendMessage
+            sendMessage,
+            loadingPreview
         };
     },
 })

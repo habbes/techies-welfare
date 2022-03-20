@@ -3,7 +3,7 @@ import { IUser } from "../../models";
 import { IUserService } from '../user';
 import { RecipientResolver } from './recipient-resolver';
 import { MessageTemplateResolver } from './template-resolver';
-import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver } from './types';
+import { BulkMessageReport, IBulkMessageService, IMessageContextFactory, IMessageTransport, IMessageTemplateResolver, IRecipientResolver, BulkMessagePreviewArgs, BulkMessagePreviewResult } from './types';
 import { getPreviewUser } from './preview-user';
 import { createAppError, createValidationError } from '../..';
 import { BulkMessageSendArgs } from '.';
@@ -55,13 +55,17 @@ export class BulkMessageService implements IBulkMessageService {
         return report;
     }
 
-    async previewMessage(messageTemplate: string): Promise<string> {
+    async previewMessage({ message, subject }: BulkMessagePreviewArgs): Promise<BulkMessagePreviewResult> {
         // create a dummy user and generate a preview message
         // based on that user
         const user = getPreviewUser();
 
-        const message = await this.createMessageForUser(user, messageTemplate);
-        return message;
+        const resultMessage = await this.createMessageForUser(user, message);
+        const resultSubject = await this.createMessageForUser(user, subject || DEFAULT_SUBJECT);
+        return {
+            message: resultMessage,
+            subject: resultSubject
+        };
     }
 
     private async getRecipients(recipientGroups: string[], report: BulkMessageReport): Promise<IUser[]> {
