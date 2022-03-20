@@ -9,34 +9,24 @@
         </div>
     </div>
 </template>
-<script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue'
 import { apiClient } from "../../../api-client";
 import { showError } from "../../../toasts";
 import TransactionsTable from "../../../components/transactions-table.vue";
-import { ITransaction } from '../../../services';
+import type { ITransaction } from '../../../services';
 
-export default defineComponent({
-    components: { TransactionsTable },
-    setup() {
-        const transactions = ref([]);
-        onMounted(async () => {
-            try {
-                transactions.value = await apiClient.getAllTransactions();
-            }
-            catch (e: any) {
-                showError(e.message);
-            }
-        });
+const transactions = ref<ITransaction[]>([]);
+onMounted(async () => {
+    try {
+        transactions.value = await apiClient.getAllTransactions();
+    }
+    catch (e: any) {
+        showError(e.message);
+    }
+});
 
-        function getTransactionRoute(trx: ITransaction) {
-            return { name: 'admin-payment-details', params: { id: trx._id } };
-        }
-
-        return {
-            transactions,
-            getTransactionRoute
-        };
-    },
-})
+function getTransactionRoute(trx: ITransaction) {
+    return { name: 'admin-payment-details', params: { id: trx._id } };
+}
 </script>

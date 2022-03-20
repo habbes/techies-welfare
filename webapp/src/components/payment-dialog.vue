@@ -1,61 +1,67 @@
 <template>
     <UiDialog ref="dialog" title="Make contribution">
         <UiForm @submit="initiatePayment">
-            <UiNumberInput required type="number" full v-model="amount" />
-            <UiLayout class="mt-3 gap-3">
-                <UiButton primary submit>Proceed to pay</UiButton>
-                <UiButton @click="close" secondary>Cancel</UiButton>
+            <UiLayout vertical smallGap>
+                <UiNumberInput label="Amount to contribute" required full v-model="amount" />
+                <UiText sm secondary>
+                    The payment provider may add
+                    a transaction fee on top of the amount.
+                </UiText>
+                <UiLayout smallGap>
+                    <UiButton primary submit>Proceed to pay</UiButton>
+                    <UiButton @click="close" secondary>Cancel</UiButton>
+                </UiLayout>
             </UiLayout>
         </UiForm>
     </UiDialog>
 </template>
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { UiDialog, UiNumberInput, UiLayout, UiButton, UiForm } from "../ui-components";
+<script lang="ts" setup>
+import { ref } from 'vue';
+import {
+    UiDialog,
+    UiNumberInput,
+    UiLayout,
+    UiButton,
+    UiForm,
+    UiText
+} from "../ui-components";
 import { apiClient } from "../api-client";
 import { showError } from "../toasts";
 
-export default defineComponent({
-    components: { UiDialog, UiNumberInput, UiLayout, UiButton, UiForm },
-    props: {
-        defaultAmount: Number,
-    },
-    setup(props) {
-        const dialog = ref<typeof UiDialog>();
-        const amount = ref(props.defaultAmount ?? 1000);
+const props = defineProps<{
+    defaultAmount?: number
+}>();
 
-        function open() {
-            dialog.value?.open();
-        }
+const dialog = ref<typeof UiDialog>();
+const amount = ref(props.defaultAmount ?? 1000);
 
-        function close() {
-            resetForm();
-            dialog.value?.close();
-        }
+function open() {
+    dialog.value?.open();
+}
 
-        function resetForm() {
-            amount.value = props.defaultAmount ?? 1000;
-        }
+function close() {
+    resetForm();
+    dialog.value?.close();
+}
 
-        async function initiatePayment() {
-            try {
-                const trx = await apiClient.initiateMyPayment({ amount: amount.value, type: 'contribution' });
-                if (trx && trx.metadata && trx.metadata.paymentUrl) {
-                    window.location = trx.metadata.paymentUrl;
-                }
-            }
-            catch (e: any) {
-                showError(e.message);
-            }
-        }
+function resetForm() {
+    amount.value = props.defaultAmount ?? 1000;
+}
 
-        return {
-            open,
-            close,
-            amount,
-            dialog,
-            initiatePayment
+async function initiatePayment() {
+    try {
+        const trx = await apiClient.initiateMyPayment({ amount: amount.value, type: 'contribution' });
+        if (trx && trx.metadata && trx.metadata.paymentUrl) {
+            window.location = trx.metadata.paymentUrl;
         }
-    },
-})
+    }
+    catch (e: any) {
+        showError(e.message);
+    }
+}
+
+defineExpose({
+    open,
+    close
+});
 </script>

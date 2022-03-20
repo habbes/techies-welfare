@@ -129,6 +129,8 @@ export const createManualTransaction = makeCommand((args: ManualEntryTransaction
     context.services.transactions.createManualTransaction(args, createUserPrincipal(context.authContext.user._id)),
     [requireScopes("Transactions.Create"), validate(createManualTransactionValidator)]);
 
+// this doesn't require authorization since it's usually issued from the flutterwave
+// post-payment page
 export const getTransactionByProviderAndId = makeCommand((args: { provider: string, id: string }, context: ICommandContext) =>
     context.services.transactions.getByProviderId(args.provider, args.id),
-    [requireScopes('Transactions.Read.All'), validate(getTransactionByProviderAndIdValidator)]);
+    [validate(getTransactionByProviderAndIdValidator)]);

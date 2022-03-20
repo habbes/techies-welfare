@@ -53,7 +53,7 @@ export function getPaymentProviderDisplayName(provider: string) {
 
 export function getTransactionDate(transaction: ITransaction): Date {
     if (transaction.provider === 'manual_entry') {
-        return new Date(transaction.metadata.recordedAt);
+        return new Date(transaction.metadata.transactionDate);
     }
 
     if (transaction.provider === 'flutterwave' && transaction.status === 'success') {
