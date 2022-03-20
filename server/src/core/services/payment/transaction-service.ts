@@ -5,6 +5,7 @@ import { InitiatePaymentArgs, IPaymentHandlerProvider, ITransactionService, Crea
 import { ManualEntryTransactionData, MANUAL_ENTRY_PAYMENT_PROVIDER_NAME } from "./manual-entry-provider";
 import { createResourceNotFoundError, rethrowIfAppError, createDbError, isMongoDuplicateKeyError, createUniquenessFailedError } from "../../error";
 import { createUserPrincipal, getSystemPrincipal } from "../../auth";
+import { COLLECTION as USERS_COLLECTION } from "../user";
 
 const COLLECTION = "transactions";
 
@@ -192,7 +193,7 @@ export class TransactionService implements ITransactionService {
                 // this will add an array `fromUserDataRaw`
                 // containing all the data of the paying user
                 $lookup: {
-                    from: 'users',
+                    from: USERS_COLLECTION,
                     localField: 'fromUser',
                     foreignField: '_id',
                     as: 'fromUserDataRaw'
