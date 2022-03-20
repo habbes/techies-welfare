@@ -11,7 +11,7 @@ type Job = (app: IAppServices) => Promise<void>;
  * @param job 
  */
 export function runJobOnSchedule(app: IAppServices, schedule: string, job: Job) {
-    const cronJob = new CronJob(schedule, async () => await job(app));
+    const cronJob = new CronJob(schedule, async () => await job(app), null, false, 'Africa/Nairobi');
 
     try {
         console.log("Scheduling job", job.name, schedule)
