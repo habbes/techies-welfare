@@ -4,4 +4,5 @@ export * from "./payment";
 export * from "./sms";
 export * from "./user";
 export * from "./system";
+export * from "./settings";
 

@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "node -r dotenv/config dist/start-server",
-    "cli": "node -r dotenv/config dist/run-cli"
+    "cli": "node -r dotenv/config dist/run-cli",
+    "worker": "node -r dotenv/config dist/start-worker"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +17,7 @@
     "africastalking": "^0.5.4",
     "argon2": "^0.28.3",
     "cors": "^2.8.5",
+    "cron": "^1.8.2",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "helmet": "^4.6.0",
@@ -27,6 +29,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/cors": "^2.8.10",
+    "@types/cron": "^1.7.3",
     "@types/inquirer": "^8.2.0",
     "@types/mongodb": "^3.6.18",
     "prettier": "2.3.1"
