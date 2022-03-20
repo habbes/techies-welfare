@@ -44,8 +44,6 @@ const route = useRoute();
 const userId = route.query.u as string;
 const loading = ref(false);
 const name = ref(route.query.n || "");
-const email = ref(route.query.e || "");
-const phone = ref(route.query.p || "");
 const amount = ref(route.query.a && Number(route.query.a) || 0);
 const user = ref();
 
