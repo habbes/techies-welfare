@@ -67,15 +67,28 @@ Currently, the server is not set-up to auto-rebuild when code changes occur. So 
 
 If you have not configured Africa's Talking as the SMS gateway (see [Configuration](#configuration)), a mock SMS gateway will be used which simply logs SMS messages on the console. When logging in, check the terminal where the server is running to see the generated OTP pass code.
 
-### Payments notifications Web Hook
+### Configuring Flutterwave integration
 
 In order to test the payments feature, you need to set up a Flutterwave account and enable Test Mode. The Test Mode will allow you to simulate Flutterwave payments without spending any money. You will be able to test a realistic Flutterwave payment UI and get webhook payment notifications.
 
+#### Configuring the Secret Key
+
 Once you've set up the account and enabled Test Mode (which is the default), on the Flutterwave dashboard go to **Settings** -> **APIS**. Copy the test **Secret Key** and configure it in the `.env` file or environment variable `FLUTTERWAVE_SECRET_KEY` (see the [Configuration](#configuration) section below). This key will allow the app to interact with your Flutterwave account.
 
+#### Configuring a local webhook for testing
 Next you need to set up a webhook to receive notifications from Flutterwave. By default, the local server expects Flutterwave notifications on `http://localhost:4000/webhooks/flutterwave`. But since Flutterwave cannot reach our localhost, we need to set up a tunnel that will link a publicly accessible URL to out localhost. We can use [ngrok.io](https://ngrok.io/) for this. Download and setup the `ngrok` tool on your machine (or a similar tool). Setup a tunnel to your local server using the command `ngrok http 4000`. The tool will setup a public URL for your local server, e.g. `abc-def.ngrok.io`. Use this as the host to your server when setting up a webhook (i.e. replacing the `localhost:4000` part).
 
 To configure your webhook on Flutterwave, go the **Webhooks** tab on the Settings page then set up the URL, e.g. `https://abc-def.ngrok.io/webhooks/flutterwave`.
+
+#### Configuring webhook on production or staging
+When you deploy your app, the webhook should target your deployed app's public domain. To "hide" the webhook from the public to avoid getting false payment notifications, you can add an secret component to the web hook path. The app allows you to set a secret webhook endpoint by setting the webhook path using the `FLUTTERWAVE_WEBHOOKS` environment variable or `env` file.
+
+For example, if you server is hosted at `https://toleo.example.com` and you set `FLUTTERWAVE_WEBHOOKS` to `/webhooks/flutterwave/randomsecret`, then the webhook to register on Flutterwave should be: `https://toleo.example.com/webhooks/flutterwave/randomsecret`.
+
+
+#### Configuring user transaction fees
+
+The app assumes that Flutterwave will apply transaction charges on top of the amount paid by the user (as opposed to deducting from the amount entered by the user). To achieve this behaviour, you must tell Flutterwave that the end user will bear the transaction costs. In your Flutterwave dashboard go to: **Settings** -> **Account Settings** -> **Make customers pay the transaction fees**
 
 ### Configuration
 
