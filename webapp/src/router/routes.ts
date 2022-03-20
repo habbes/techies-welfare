@@ -2,6 +2,7 @@ import { RouteRecordRaw } from "vue-router";
 import DashboardPage from "../pages/dashboard/dashboard-page.vue";
 import DashboardHome from "../pages/dashboard/dashboard-home.vue";
 import ContributionsPage from "../pages/dashboard/contributions-page.vue";
+import MyPaymentDetailsPage from "../pages/dashboard/my-payment-details.vue";
 import PaymentPage from "../pages/payment/payment-page.vue";
 import FlutterWavePostPaymentPage from "../pages/payment/flutterwave-post-payment.vue";
 import AdminPage from "../pages/admin/admin-page.vue";
@@ -9,6 +10,7 @@ import AdminMembersPage from "../pages/admin/members/members.vue";
 import AdminAddMemberPage from "../pages/admin/members/add-member.vue";
 import AdminMemberDetailsPage from "../pages/admin/members/member-details.vue";
 import AdminPaymentsPage from "../pages/admin/payments/payments.vue";
+import AdminPaymentDetailsPage from "../pages/admin/payments/payment-details.vue";
 import AdminMessagingPage from "../pages/admin/messaging.vue";
 import AuthResponse from "../pages/auth/auth-response.vue";
 import LoginPage from "../pages/auth/login.vue";
@@ -28,6 +30,11 @@ export const routes: RouteRecordRaw[] = [
                         path: "",
                         name: "contributions",
                         component: ContributionsPage
+                    },
+                    {
+                        path: "payments/:id",
+                        name: "my-payment-details",
+                        component: MyPaymentDetailsPage
                     }
                 ]
             },
@@ -68,6 +75,11 @@ export const routes: RouteRecordRaw[] = [
                         path: "payments",
                         name: "admin-payments",
                         component: AdminPaymentsPage
+                    },
+                    {
+                        path: "payments/:id",
+                        name: "admin-payment-details",
+                        component: AdminPaymentDetailsPage
                     }
                 ]
             }
@@ -76,12 +88,18 @@ export const routes: RouteRecordRaw[] = [
     {
         path: '/pay',
         component: PaymentPage,
-        name: "pay"
+        name: "pay",
+        meta: {
+            noAuth: true
+        }
     },
     {
         path: '/post-payment/flutterwave',
         component: FlutterWavePostPaymentPage,
-        name: 'flutterwave-post-payment'
+        name: 'flutterwave-post-payment',
+        meta: {
+            noAuth: true
+        }
     },
     {
         path: '/auth-response',

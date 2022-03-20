@@ -26,7 +26,7 @@ const TOKEN_COLLECTION = "auth_tokens";
 const TOKEN_VALIDITY_MILLIS = 2 * 24 * 3600 * 1000; // 2 days
 const OTP_VALIDITY_MILLIS = 2 * 60 * 1000; // 2 minutes
 
-type SafeUserProjection = Record<keyof IUser, number>;
+type SafeUserProjection = Record<keyof IUser, 1>;
 
 /**
  * used to ensure sensitive details are not leaked
@@ -45,7 +45,8 @@ const SAFE_USER_PROJECTION: SafeUserProjection = {
     updatedAt: 1,
     memberSince: 1,
     status: 1,
-    createdBy: 1
+    createdBy: 1,
+    updatedBy: 1
 };
 
 interface IStoredUser extends IUser {
@@ -120,7 +121,8 @@ export class UserService implements IUserService {
             status: 'active',
             hasPassword,
             password,
-            createdBy
+            createdBy,
+            updatedBy: createdBy
         };
 
         try {
@@ -182,12 +184,16 @@ export class UserService implements IUserService {
         }
     }
 
-    async makeAdmin(id: string): Promise<IUser> {
+    async makeAdmin(id: string, updatedBy: IPrincipal): Promise<IUser> {
         try {
             const res = await this.collection.findOneAndUpdate({
                 _id: id
             }, {
-                $addToSet: { roles: 'admin' }
+                $addToSet: { roles: 'admin' },
+                $set: {
+                    updatedAt: new Date(),
+                    updatedBy
+                }
             }, {
                 returnDocument: 'after'
             })
@@ -339,7 +345,7 @@ export class UserService implements IUserService {
     }
 
     getTransactions(id: string): Promise<ITransaction[]> {
-        return this.transactions.getAllByUser(id);
+        return this.transactions.get({ fromUser: id });
     }
 
     async getAccountSummary(id: string): Promise<IUserAccountSummary> {

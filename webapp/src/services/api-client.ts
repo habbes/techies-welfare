@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { IAuthService } from "./auth";
+import { ITransaction, IUser } from "./types";
 
 interface InitiatePaymentArgs {
     userId: string;
@@ -93,11 +94,15 @@ export class ApiClient {
     }
 
     getLoggedInUser() {
-        return getData(this.httpClient.get(`/me`));
+        return getData<IUser>(this.httpClient.get(`/me`));
     }
 
     getMyTransactions() {
-        return getData(this.httpClient.get('/me/transactions'));
+        return getData<ITransaction[]>(this.httpClient.get('/me/transactions'));
+    }
+
+    getMyTransactionById(id: string) {
+        return getData<ITransaction>(this.httpClient.get(`/me/transactions/${id}`));
     }
 
     initiateMyPayment({ amount, type = 'contribution' }: { amount: number, type: string }) {
@@ -109,11 +114,11 @@ export class ApiClient {
     }
 
     getUserTransactions(id: string) {
-        return getData(this.httpClient.get(`/users/${id}/transactions`));
+        return getData<ITransaction[]>(this.httpClient.get(`/users/${id}/transactions`));
     }
 
     createUser(args: CreateUserArgs) {
-        return getData(this.httpClient.post('/users', args));
+        return getData<IUser>(this.httpClient.post('/users', args));
     }
 
     login(args: LoginArgs): Promise<LoginResult> {
@@ -129,15 +134,19 @@ export class ApiClient {
     }
 
     getAllTransactions() {
-        return getData(this.httpClient.get('/transactions'));
+        return getData<ITransaction[]>(this.httpClient.get('/transactions'));
     }
 
-    getTransactionByProviderId(provider: string, providerId: string) {
-        return getData(this.httpClient.get(`/transactions/provider/${provider}/${providerId}`));
+    getTransactionByProviderId(provider: string, providerTransactionId: string) {
+        return getData<ITransaction>(this.httpClient.get(`/transactions/provider/${provider}/${providerTransactionId}`));
+    }
+
+    getTransactionById(id: string) {
+        return getData<ITransaction>(this.httpClient.get(`/transactions/${id}`));
     }
 
     initiatePayment({ userId, amount, type = 'contribution' }: InitiatePaymentArgs) {
-        return getData(this.httpClient.post(`/users/${userId}/pay`, { amount, type }));
+        return getData(this.httpClient.post(`/transactions/initiate`, { userId, amount, type }));
     }
 
     addManualPayment(args: ManualEntryTransactionArgs) {

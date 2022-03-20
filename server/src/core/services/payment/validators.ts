@@ -5,6 +5,12 @@ export const initiatePaymentValidator = Joi.object({
     type: Joi.string().valid('contribution').required()
 });
 
+export const initiateTransactionForUserValidator = Joi.object({
+    userId: Joi.string().required(),
+    amount: Joi.number().integer().greater(0).required(),
+    type: Joi.string().valid('contribution').required()
+});
+
 export const createManualTransactionValidator = Joi.object({
     id: Joi.string().required(),
     fromUser: Joi.string().required(),

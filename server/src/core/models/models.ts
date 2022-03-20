@@ -13,6 +13,13 @@ export interface HasCreatedBy {
     createdBy: IPrincipal;
 };
 
+export interface HasUpdatedBy {
+    updatedBy: IPrincipal;
+};
+
+export interface HasCreatorUpdator extends HasCreatedBy, HasUpdatedBy  {
+}
+
 /**
  * The type of principal or agent
  * who can interact with the system
@@ -31,7 +38,7 @@ type SystemPrincipal = { type: "system", _id: "system" };
  */
 export type IPrincipal = UserPrincipal | SystemPrincipal;
 
-export interface IUser extends HasId, HasTimestamps, HasCreatedBy {
+export interface IUser extends HasId, HasTimestamps, HasCreatorUpdator {
     name: string;
     team: string;
     phone: string;
@@ -68,7 +75,7 @@ export interface IUserAccountSummary {
     arrears: number;
 }
 
-export interface ITransaction<ProviderMetadata = any> extends HasId, HasTimestamps {
+export interface ITransaction<ProviderMetadata = any> extends HasId, HasCreatorUpdator, HasTimestamps {
     amount: number;
     provider: string;
     providerTransactionId?: string;
@@ -77,6 +84,13 @@ export interface ITransaction<ProviderMetadata = any> extends HasId, HasTimestam
     type: TransactionType;
     fromUser: string;
     failureReason?: string;
+}
+
+export interface ITransactionWithUserData<ProviderMetadata = any> extends ITransaction<ProviderMetadata> {
+    fromUserData: {
+        _id: string;
+        name: string;
+    }
 }
 
 export type TransactionStatus = 'pending' | 'failed' | 'success';

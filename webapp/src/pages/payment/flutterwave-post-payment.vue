@@ -1,27 +1,36 @@
 <template>
-    <UiCard class="w-1/3 mx-auto mt-14">
-        <UiLayout vertical>
-            <UiText v-if="verifying">
-                Verifying transaction. Please wait...
-            </UiText>
-            <UiText v-else-if="cancelled">
-                Transaction was cancelled.
-            </UiText>
-            <UiText v-else-if="transaction && transaction.status === 'pending'">
-                Transaction is still <b>pending</b>. Refresh the page after a few minutes to check again...
-            </UiText>
-            <UiText v-else-if="transaction && transaction.status === 'failed'" danger>
-                Transaction failed: {{ transaction.failureReason }}
-            </UiText>
-            <UiText v-else-if="transaction && transaction.status === 'success'" success>
-                Success: Ksh {{ transaction.amount }} was successfully received.
-            </UiText>
+    <UiLayout vertical>
+        <NavBar/>
+        <UiCard class="w-1/3 mx-auto mt-14">
+            <UiLayout vertical smallGap>
+                <UiText v-if="verifying">
+                    Verifying transaction. Please wait...
+                </UiText>
+                <UiText v-else-if="cancelled">
+                    Transaction was cancelled.
+                </UiText>
+                <UiText v-else-if="transaction && transaction.status === 'pending'">
+                    Transaction is still <b>pending</b>. Refresh the page after a few minutes to check again...
+                </UiText>
+                <UiText v-else-if="transaction && transaction.status === 'failed'" danger>
+                    Transaction failed: {{ transaction.failureReason }}
+                </UiText>
+                <UiText v-else-if="transaction && transaction.status === 'success'" success>
+                    Success: Ksh {{ transaction.amount }} was successfully received.
+                </UiText>
 
-            <UiLayout class="mt-5">
-                <UiRouterButton to="/" secondary>Back to home page</UiRouterButton>
+                <UiLayout smallGap>
+                    <UiButton
+                        primary
+                        v-if="transaction && transaction.status === 'pending'"
+                        @click="fetchTransaction">
+                        Refresh
+                    </UiButton>
+                    <UiRouterButton to="/" secondary>Back to home page</UiRouterButton>
+                </UiLayout>
             </UiLayout>
-        </UiLayout>
-    </UiCard>
+        </UiCard>
+    </UiLayout>
 </template>
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
@@ -29,20 +38,40 @@ import { useRoute } from "vue-router";
 import { apiClient } from "../../api-client";
 import { useUser } from "../../store";
 import { showError } from "../../toasts";
-import { UiCard, UiRouterButton, UiLayout, UiText } from "../../ui-components";
+import {
+    UiCard,
+    UiButton,
+    UiRouterButton,
+    UiLayout,
+    UiText
+} from "../../ui-components";
+import NavBar from "../../components/navbar.vue";
 
 export default defineComponent({
-    components: { UiRouterButton, UiCard, UiLayout, UiText },
+    components: {
+        UiButton,
+        UiRouterButton,
+        UiCard,
+        UiLayout,
+        UiText,
+        NavBar
+    },
     setup() {
         const verifying = ref(true);
         const transaction = ref<any>({});
         const cancelled = ref(false);
+        const txId = ref<string>();
 
         onMounted(async () => {
-            const txId = getTxRef();
-            if (txId) {
+            txId.value = getTxRef();
+            await fetchTransaction();
+        });
+
+        async function fetchTransaction() {
+            if (txId.value) {
+                verifying.value = true;
                 try {
-                    transaction.value = await apiClient.getTransactionByProviderId('flutterwave', txId);
+                    transaction.value = await apiClient.getTransactionByProviderId('flutterwave', txId.value);
                     if (transaction.value.status === 'success') {
                         // refresh account summary if transaction is successful
                         // so arrears and total contribution counts can be updated
@@ -58,7 +87,7 @@ export default defineComponent({
                 }
                 verifying.value = false;
             }
-        });
+        }
 
         function getTxRef() {
             const query = useRoute().query;
@@ -83,7 +112,8 @@ export default defineComponent({
         return {
             transaction,
             verifying,
-            cancelled
+            cancelled,
+            fetchTransaction
         }
     },
 })

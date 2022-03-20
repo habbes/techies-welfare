@@ -1,15 +1,14 @@
-import { IUser, ITransaction, TransactionStatus, TransactionType, IPrincipal } from "../../models";
+import { IUser, ITransaction, TransactionStatus, TransactionType, IPrincipal, ITransactionWithUserData } from "../../models";
 import { ManualEntryTransactionData } from "./manual-entry-provider";
 
 export interface ITransactionService {
     initiateUserPayment(user: IUser, args: InitiatePaymentArgs): Promise<ITransaction>;
     getUserContributionsTotal(userId: string): Promise<number>;
-    getById(id: string): Promise<ITransaction>;
-    getAllByUser(userId: string): Promise<ITransaction[]>;
-    getByUserAndId(userId: string, transactionId: string): Promise<ITransaction>;
-    getAll(): Promise<ITransaction[]>;
-    getById(transactionId: string): Promise<ITransaction>;
-    getByProviderId(provider: string, transactionId: string): Promise<ITransaction>;
+    getById(id: string): Promise<ITransactionWithUserData>;
+    getByUserAndId(userId: string, transactionId: string): Promise<ITransactionWithUserData>;
+    get(filter: ITransactionFilter): Promise<ITransactionWithUserData[]>;
+    getById(transactionId: string): Promise<ITransactionWithUserData>;
+    getByProviderId(provider: string, transactionId: string): Promise<ITransactionWithUserData>;
     handleProviderNotification<TPaymentNotification = Record<string, any>>(providerName: string, notification: TPaymentNotification): Promise<ITransaction>;
     createManualTransaction(args: ManualEntryTransactionData, recordedBy: IPrincipal): Promise<ITransaction>;
 }
@@ -32,6 +31,13 @@ export interface IPaymentHandlerProvider {
     getDefault(): IPaymentHandler;
 }
 
+export interface ITransactionFilter {
+    fromUser?: string;
+    provider?: string;
+    providerTransactionId?: string;
+    id?: string;
+}
+
 export interface CreateTransactionArgs<TProviderMetadata = Record<string, any>> {
     fromUser: string;
     type: TransactionType;
@@ -45,6 +51,10 @@ export interface CreateTransactionArgs<TProviderMetadata = Record<string, any>> 
 export interface InitiatePaymentArgs {
     amount: number;
     type: TransactionType;
+}
+
+export interface InitiatePaymentForUserArgs extends InitiatePaymentArgs {
+    userId: string;
 }
 
 export interface PaymentRequestResult<TProviderMetadata = Record<string, any>> {
