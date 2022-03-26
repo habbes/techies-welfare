@@ -1,11 +1,10 @@
-import Joi from "joi";
 import { IValidator, validateWith } from "../../util";
 import { Permission } from "../auth";
 import { createPermissionError } from "../error";
-import { ICommandMiddleware } from "../infra";
+import { ICommandGlobalPostMiddleware, ICommandPostMiddleware, ICommandPreMiddleware } from "../infra";
 import { ICommandContext } from "./types";
 
-export function requireScopes<TInput>(...scopes: Permission[]): ICommandMiddleware<TInput, ICommandContext> {
+export function requireScopes<TInput>(...scopes: Permission[]): ICommandPreMiddleware<TInput, ICommandContext> {
     return (input, context) => {
         if (!(context.authContext && context.authContext.scopes)) {
             throw createPermissionError();
@@ -19,9 +18,16 @@ export function requireScopes<TInput>(...scopes: Permission[]): ICommandMiddlewa
     }
 }
 
-export function validate<TInput>(validator: IValidator): ICommandMiddleware<TInput, ICommandContext> {
+export function validate<TInput>(validator: IValidator): ICommandPreMiddleware<TInput, ICommandContext> {
     return (input, context) => {
         validateWith(validator, input);
+        return Promise.resolve();
+    }
+}
+
+export function logActivity(): ICommandGlobalPostMiddleware<ICommandContext> {
+    return (input, result, context) => {
+        // implement activity logging
         return Promise.resolve();
     }
 }
