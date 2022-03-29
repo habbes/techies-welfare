@@ -32,21 +32,21 @@ export const hasSetupRun = makeCommand((_, context: ICommandContext) =>
 export const runSetup = makeCommand((args: RunSetupArgs, context: ICommandContext) =>
     context.services.system.runSetup(args),
     {
-        before: [validate(runSetupValidator)]
+        pre: [validate(runSetupValidator)],
     });
 
 export const previewMessage = makeCommand((args: BulkMessagePreviewArgs, context: ICommandContext) => {
     return context.services.bulkMessages.previewMessage(args);
 },
 {
-    before: [requireScopes('Messages.Preview'), validate(previewMessageValidator)]
+    pre: [requireScopes('Messages.Preview'), validate(previewMessageValidator)]
 });
 
 export const notifyUsers = makeCommand<BulkMessageSendArgs, BulkMessageReport, ICommandContext>((args, context) => {
     return context.services.bulkMessages.send(args);
 },
 {
-    before:[requireScopes('Messages.Broadcast'), validate(sendBulkMessageValidator)]
+    pre:[requireScopes('Messages.Broadcast'), validate(sendBulkMessageValidator)]
 });
 
 export const createUser = makeCommand((args: CreateUserArgs, context: ICommandContext) => {
@@ -54,28 +54,28 @@ export const createUser = makeCommand((args: CreateUserArgs, context: ICommandCo
         { type: "user", _id: context.authContext.user._id });
 },
 {
-    before: [requireScopes('Users.Create'), validate(createUserValidator)]
+    pre: [requireScopes('Users.Create'), validate(createUserValidator)]
 });
 
 export const getUsers = makeCommand((_, context: ICommandContext) => {
     return context.services.users.getAll();
 },
 {
-    before: [requireScopes('Users.Read.All')]
+    pre: [requireScopes('Users.Read.All')]
 });
 
 export const getUserById = makeCommand((id: string, context: ICommandContext) => {
     return context.services.users.getById(id);
 },
 {
-    before: [requireScopes('Users.Read.All'), validate(stringValidator)]
+    pre: [requireScopes('Users.Read.All'), validate(stringValidator)]
 });
 
 export const login = makeCommand((args: LoginArgs, context: ICommandContext) => {
     return context.services.users.login(args);
 },
 {
-    before: [validate(loginValidator)],
+    pre: [validate(loginValidator)],
     skipGlobalMiddleware: true,
 });
 
@@ -83,44 +83,44 @@ export const requestTemporaryPassCode = makeCommand((args: RequestPassCodeArgs, 
     return context.services.users.requestTemporaryPassCode(args);
 },
 {
-    before: [validate(requestPassCodeValidator)],
+    pre: [validate(requestPassCodeValidator)],
     skipGlobalMiddleware: true,
 });
 
 export const logout = makeCommand((token: string, context: ICommandContext) =>
     context.services.users.logout(token),
     {
-        before: [requireScopes('Users.Logout.Self'), validate(stringValidator)]
+        pre: [requireScopes('Users.Logout.Self'), validate(stringValidator)]
     });
 
 export const logoutAll = makeCommand((_, context: ICommandContext) =>
     context.services.users.logoutAll(context.authContext.user._id),
     {
-        before: [requireScopes('Users.Logout.Self')]
+        pre: [requireScopes('Users.Logout.Self')]
     });
 
 export const getMe = makeCommand((_, context: ICommandContext) =>
     Promise.resolve(context.authContext.user),
     {
-        before: [requireScopes('Users.Read.Self')]
+        pre: [requireScopes('Users.Read.Self')]
     });
 
 export const getMyTransactions = makeCommand((_, context: ICommandContext) =>
     context.services.users.getTransactions(context.authContext.user._id),
     {
-        before: [requireScopes('Transactions.Read.Self')]
+        pre: [requireScopes('Transactions.Read.Self')]
     });
 
 export const getMyTransactionById = makeCommand((transactionId: string, context: ICommandContext) =>
     context.services.transactions.getByUserAndId(context.authContext.user._id, transactionId),
     {
-        before: [requireScopes('Transactions.Read.Self'), validate(stringValidator)]
+        pre: [requireScopes('Transactions.Read.Self'), validate(stringValidator)]
     });
 
 export const initiateTransaction = makeCommand((args: InitiatePaymentArgs, context: ICommandContext) =>
     context.services.users.initiatePayment(context.authContext.user._id, args),
     {
-        before: [requireScopes('Transactions.Initiate.Self'), validate(initiatePaymentValidator)]
+        pre: [requireScopes('Transactions.Initiate.Self'), validate(initiatePaymentValidator)]
     });
 
 /**
@@ -138,49 +138,49 @@ export const initiateTransaction = makeCommand((args: InitiatePaymentArgs, conte
 export const initiateTransactionForUser = makeCommand((args: InitiatePaymentForUserArgs, context: ICommandContext) =>
     context.services.users.initiatePayment(args.userId, args),
     {
-        before: [validate(initiateTransactionForUserValidator)]
+        pre: [validate(initiateTransactionForUserValidator)]
     });
 
 export const getMyAccountSummary = makeCommand((_, context: ICommandContext) =>
     context.services.users.getAccountSummary(context.authContext.user._id),
     {
-        before: [requireScopes('Transactions.Read.Self', 'Users.Read.Self')]
+        pre: [requireScopes('Transactions.Read.Self', 'Users.Read.Self')]
     });
 
 export const getUserTransactions = makeCommand((user: string, context: ICommandContext) =>
     context.services.users.getTransactions(user),
     {
-        before: [requireScopes('Transactions.Read.All', 'Users.Read.All'), validate(stringValidator)]
+        pre: [requireScopes('Transactions.Read.All', 'Users.Read.All'), validate(stringValidator)]
     });
 
 export const getUserAccountSummary = makeCommand((user: string, context: ICommandContext) =>
     context.services.users.getAccountSummary(user),
     {
-        before: [requireScopes('Transactions.Read.All', 'Users.Read.All'), validate(stringValidator)]
+        pre: [requireScopes('Transactions.Read.All', 'Users.Read.All'), validate(stringValidator)]
     });
 
 export const makeUserAdmin = makeCommand((user: string, context: ICommandContext) =>
     context.services.users.makeAdmin(user, createUserPrincipal(context.authContext.user._id)),
     {
-        before: [requireScopes('Users.Write.All'), validate(stringValidator)]
+        pre: [requireScopes('Users.Write.All'), validate(stringValidator)]
     });
 
 export const getTransactions = makeCommand((_, context: ICommandContext) =>
     context.services.transactions.get({}),
     {
-        before: [requireScopes('Transactions.Read.All')]
+        pre: [requireScopes('Transactions.Read.All')]
     });
 
 export const getTransactionById = makeCommand((id: string, context: ICommandContext) =>
     context.services.transactions.getById(id),
     {
-        before: [requireScopes('Transactions.Read.All'), validate(stringValidator)]
+        pre: [requireScopes('Transactions.Read.All'), validate(stringValidator)]
     });
 
 export const createManualTransaction = makeCommand((args: ManualEntryTransactionData, context: ICommandContext) =>
     context.services.transactions.createManualTransaction(args, createUserPrincipal(context.authContext.user._id)),
     {
-        before: [requireScopes("Transactions.Create"), validate(createManualTransactionValidator)]
+        pre: [requireScopes("Transactions.Create"), validate(createManualTransactionValidator)]
     });
 
 // this doesn't require authorization since it's usually issued from the flutterwave
@@ -188,5 +188,5 @@ export const createManualTransaction = makeCommand((args: ManualEntryTransaction
 export const getTransactionByProviderAndId = makeCommand((args: { provider: string, id: string }, context: ICommandContext) =>
     context.services.transactions.getByProviderId(args.provider, args.id),
     {
-        before: [validate(getTransactionByProviderAndIdValidator)]
+        pre: [validate(getTransactionByProviderAndIdValidator)]
     });

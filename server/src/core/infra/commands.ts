@@ -77,7 +77,7 @@ export interface ICommandConfig<TInput, TOutput, TCommandContext> {
      * command pipeline is terminate and that exception
      * bubbles up to the caller.
      */
-    before?: ICommandPreMiddleware<TInput, TCommandContext>[];
+    pre?: ICommandPreMiddleware<TInput, TCommandContext>[];
     /**
      * List of middleware to be executed sequentially after the command handler.
      * These middleware will receive the output that was returned by the handler.
@@ -86,7 +86,7 @@ export interface ICommandConfig<TInput, TOutput, TCommandContext> {
      * When handling such exceptions, bear in mind that the command handler
      * has already executed successfully.
      */
-    after?: ICommandPostMiddleware<TInput, TOutput, TCommandContext>[];
+    post?: ICommandPostMiddleware<TInput, TOutput, TCommandContext>[];
     /**
      * Set true to skip global middleware for this
      * command. This is useful for commands that handle
@@ -106,8 +106,8 @@ export function makeCommand<TInput, TOutput, TCommandContext>(
     config: ICommandConfig<TInput, TOutput, TCommandContext> = {}): ICommand<TInput, TOutput, TCommandContext> {
     return {
         handler,
-        preMiddleware: config.before || [],
-        postMiddleware: config.after || [],
+        preMiddleware: config.pre || [],
+        postMiddleware: config.post || [],
         name: handler.name,
         skipGlobalMiddleware: config.skipGlobalMiddleware
     };
