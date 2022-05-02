@@ -1,7 +1,7 @@
 import { RequestHandler, ErrorRequestHandler } from "express";
 import { sendErrorResponse, sendServerError } from "./util";
 import { AppRequest } from "../server";
-import { AppError, createInvalidTokenError, createValidationError, createResourceNotFoundError, IAppServices, CommandManager } from "../core";
+import { AppError, createInvalidTokenError, createValidationError, createResourceNotFoundError, IAppServices, createCommandExecutor } from "../core";
 
 /**
  * This makes the core app services available to the
@@ -28,7 +28,7 @@ export function injectAppServices(services: IAppServices): RequestHandler {
  */
 export function injectAppCommands(): RequestHandler {
     return (req: AppRequest, res, next) => {
-        const executor = new CommandManager(() => ({ services: req.appServices, authContext: req.authContext })).getExecutor();
+        const executor = createCommandExecutor(req.appServices, req.authContext);
         req.commands = executor;
         next();
     };

@@ -1,10 +1,9 @@
 import { prompt } from "inquirer";
 import {
     bootstrap,
-    CommandManager,
+    createCommandExecutor,
     IAppServices,
     IAuthContext,
-    ICommandContext,
     loadAppConfigFrom,
     login,
     LoginArgs } from "../core";
@@ -25,10 +24,7 @@ export async function loadServices(): Promise<IAppServices> {
 }
 
 async function createContextWithoutAuth(services: IAppServices): Promise<ICliContext> {
-    const executor = new CommandManager<ICommandContext>(() => ({
-        services,
-        authContext: null
-    })).getExecutor();
+    const executor = createCommandExecutor(services, null);
 
     return Promise.resolve({
         executor
@@ -45,7 +41,7 @@ async function createContext(services: IAppServices): Promise<ICliContext> {
         user: result.user
     };
 
-    const executor = new CommandManager(() => ({ services, authContext })).getExecutor();
+    const executor = createCommandExecutor(services, authContext);
 
     return {
         executor
